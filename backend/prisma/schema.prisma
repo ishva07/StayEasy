@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model client {
+  id   String @id @default(cuid())
+  name String
+}
+
+model Hotel {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  room        Room[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Room {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  capacity  Int
+  price     Decimal @db.Decimal(10, 2)
+  roomImage String?
+  hotelId   String
+  hotel     Hotel   @relation(fields: [hotelId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password String
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  user      User[]
+  permissions RolePermission[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  role RolePermission[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RolePermission {
+  id        String   @id @default(cuid())
+  roleId String
+  permissionId String
+
+  role Role @relation(fields: [roleId],references: [id])
+  permission Permission @relation(fields: [permissionId],references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([roleId,permissionId])
+}
