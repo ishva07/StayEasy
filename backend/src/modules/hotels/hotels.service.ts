@@ -45,16 +45,15 @@ export const getHotelsByIdService = async(id:string)=>{
 export const getHotelService = async({page=1,limit=10,sortBy="createdAt",order="desc",search=""})=>{
     const skip = (page-1)*limit;
 
-   const where = search ? {
-    OR:[
-        {name:{contains:search,mode:"insensitive" as const}},
-        {description:{contains:search,mode:"insensitive" as const}}
-    ]
-   } : {}
+//    const where = search ? {
+//     OR:[
+//         {name:{contains:search,mode:"insensitive" as const}},
+//         {description:{contains:search,mode:"insensitive" as const}}
+//     ]
+//    } : {}
 
     const [ data, total] = await Promise.all([
         prisma.hotel.findMany({
-            where,
             skip,
             take:limit,
             orderBy:{[sortBy]:order}

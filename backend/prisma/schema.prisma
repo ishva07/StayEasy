@@ -17,34 +17,13 @@ model client {
   name String
 }
 
-model Hotel {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String
-  room        Room[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Room {
-  id        String  @id @default(cuid())
-  name      String  @unique
-  capacity  Int
-  price     Decimal @db.Decimal(10, 2)
-  roomImage String?
-  hotelId   String
-  hotel     Hotel   @relation(fields: [hotelId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   password String
   roleId    String
   role      Role     @relation(fields: [roleId], references: [id])
+  booking Booking[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -77,4 +56,87 @@ model RolePermission {
   updatedAt DateTime @updatedAt
 
   @@unique([roleId,permissionId])
+}
+
+model Hotel {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  city String?
+  address String?
+  heroImage String?
+  isFeatured Boolean @default(false)
+  room        Room[]
+  hotelAmenities HotelAmenities[]
+  hotelImages HotelImages[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Room {
+  id        String  @id @default(cuid())
+  name      String  
+  capacity  Int
+  price     Decimal @db.Decimal(10, 2)
+  roomImage String?
+  hotelId   String
+  hotel     Hotel   @relation(fields: [hotelId], references: [id])
+  booking Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name,hotelId])
+}
+
+model Amenities{
+  id String @id @default(cuid())
+  name String @unique
+  hotel HotelAmenities[]
+  createdAt DateTime @default(now())
+}
+
+
+model HotelAmenities{
+  id String @id @default(cuid())
+  hotelId String
+  hotel Hotel @relation(fields: [hotelId], references: [id])
+  amenitiesId String
+  amenities Amenities @relation(fields: [amenitiesId], references: [id])
+  
+  @@unique([hotelId,amenitiesId])
+}
+
+model HotelImages{
+  id String @id @default(cuid())
+  url String 
+  hotelId String
+  hotel Hotel @relation(fields: [hotelId],references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Booking{
+  id String @id @default(cuid())
+  checkIn DateTime 
+  checkOut DateTime
+  totalPrice Decimal @db.Decimal(10,2)
+  status BookingStatus @default(PENDING)
+  roomId String
+  userId String
+
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId],references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+
+enum BookingStatus{
+  CANCELED
+  PENDING
+  CHECKIN
+  CHECKOUT
+  CONFIRMED
 }

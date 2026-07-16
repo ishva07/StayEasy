@@ -4,16 +4,18 @@ import { createHotelsService, deleteHotelService, editHotelsService, getHotelsBy
 import ApiResponse from "../../utils/ApiResponse";
 
 export const createHotelController = asyncHandler(async(req:Request,res:Response)=>{
-    const data = req.body;
-    const newHotel = await createHotelsService(data);
+    const {name,description,city,address,isFeatured} = req.body;
+    const heroImage = req.file? `/uploads/${req.file.filename}` : "" 
+    const newHotel = await createHotelsService({name,description,city,address,isFeatured,heroImage});
     res.status(201).json(new ApiResponse(true,"hotel created successfully",newHotel))
 })
 
 export const editHotelController = asyncHandler(async(req:Request,res:Response)=>{
     const id = req.params.id.toString();
-    const data= req.body;
+    const {name,description,city,address,isFeatured} = req.body;
+    const heroImage = req.file? `/uploads/${req.file.filename}` : "" 
 
-    const updatedHotel = await editHotelsService(id,data)
+    const updatedHotel = await editHotelsService(id,{name,description,city,address,isFeatured,heroImage})
     res.status(200).json(new ApiResponse(true,"hotel updated successfully",updatedHotel));
 })
 

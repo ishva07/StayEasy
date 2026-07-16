@@ -1,13 +1,21 @@
 import prisma from "../../config/db";
 import ApiError from "../../utils/ApiError";
-import { CreateRoomInterface, UpdateRoomInterface } from './rooms.types';
+import { CreateRoomInterface, UpdateRoomInterface } from "./rooms.types";
 
-export const createRoomService = async ({ name, capacity, price, roomImage, hotelId}: CreateRoomInterface) => {
+export const createRoomService = async ({
+  name,
+  capacity,
+  price,
+  roomImage,
+  hotelId,
+}: CreateRoomInterface) => {
   const hotelExit = await prisma.hotel.findUnique({ where: { id: hotelId } });
   if (!hotelExit)
     throw new ApiError(404, "No Hotel Exist.. provide valid hotel id.");
 
-  const roomName = await prisma.room.findFirst({ where: { name: name } });
+  const roomName = await prisma.room.findFirst({
+    where: { name: name, hotelId },
+  });
   if (roomName) throw new ApiError(409, "Room Already Exist");
 
   const newRoom = await prisma.room.create({
@@ -16,34 +24,59 @@ export const createRoomService = async ({ name, capacity, price, roomImage, hote
   return newRoom;
 };
 
-export const editRoomService = async (id: string, data: UpdateRoomInterface) => {
-  const roomId = await prisma.room.findUnique({ where: { id } });
-  if (!roomId) throw new ApiError(404, "No Room Available on this id");
+export const editRoomService = async (
+  hotelId: string,
+  roomId: string,
+  data: UpdateRoomInterface,
+) => {
+  const hotelExit = await prisma.hotel.findUnique({ where: { id: hotelId } });
+  if (!hotelExit)
+    throw new ApiError(404, "No Hotel Exist.. provide valid hotel id.");
+
+  const roomExist = await prisma.room.findUnique({ where: { id: roomId } });
+  if (!roomExist) throw new ApiError(404, "No Room Available on this id");
 
   if (data.name) {
-    const roomExist = await prisma.room.findFirst({
-      where: { id, name: data.name },
+    const roomNameExist = await prisma.room.findFirst({
+      where: { hotelId, NOT: { id: roomId }, name: data.name },
     });
-    if (roomExist) throw new ApiError(409, "Room Already Exist");
+    if (roomNameExist) throw new ApiError(409, "Room Already Exist");
   }
 
-  const updatedRoom = await prisma.room.update({ where: { id }, data });
+  const updatedRoom = await prisma.room.update({ where: { id: roomId }, data });
   return updatedRoom;
 };
 
-export const deleteRoomService = async (id: string) => {
-  const roomId = await prisma.room.findUnique({ where: { id } });
-  if (!roomId) throw new ApiError(404, "No Room Available on this id");
+export const deleteRoomService = async (hotelId: string, roomId: string) => {
+  const hotelExit = await prisma.hotel.findUnique({ where: { id: hotelId } });
+  if (!hotelExit)
+    throw new ApiError(404, "No Hotel Exist.. provide valid hotel id.");
 
-  const deletedRoom = await prisma.room.delete({ where: { id } });
+  const roomExist = await prisma.room.findUnique({ where: { id: roomId } });
+  if (!roomExist) throw new ApiError(404, "No Room Available in this hotel");
+
+  const deletedRoom = await prisma.room.delete({ where: { id: roomId } });
   return deletedRoom;
 };
 
-export const getRoomByIdService = async (id: string) => {
-  const roomId = await prisma.room.findUnique({ where: { id } });
-  if (!roomId) throw new ApiError(404, "No Room Available on this id");
+export const getRoomByIdService = async (hotelId: string, roomId: string) => {
+  const hotelExit = await prisma.hotel.findUnique({ where: { id: hotelId } });
+  if (!hotelExit)
+    throw new ApiError(404, "No Hotel Exist.. provide valid hotel id.");
 
-  const getRoomById = await prisma.room.findUnique({ where: { id } });
+  const getRoomById = await prisma.room.findUnique({
+    where: { id: roomId },
+    include: {
+      hotel: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+        },
+      },
+    },
+  });
+  if (!getRoomById) throw new ApiError(404, "No Room Available on this hotel");
   return getRoomById;
 };
 
@@ -59,17 +92,21 @@ export const getRoomService = async (
   const allowOrders = ["asc", "desc"];
   const sortOrder = allowOrders.includes(order) ? order : "desc";
 
-  const where = {
-    hotelId,
-    ...(search && [{ name: { contains: search, mode: "insensitive" } }]),
-  };
+  // const where = {
+  //   hotelId,
+  //   ...(search && {
+  //      OR:[
+  //       { name: { contains: search, mode: "insensitive" as const} }
+  //     ]
+  //   }
+  //     ),
+  // };
 
   const [data, total] = await Promise.all([
     prisma.room.findMany({
       skip,
       take: limit,
       orderBy: { [sortedBy]: sortOrder },
-      where,
       include: {
         hotel: {
           select: {
@@ -81,7 +118,7 @@ export const getRoomService = async (
         },
       },
     }),
-    prisma.room.count({ where }),
+    prisma.room.count(),
   ]);
 
   return {

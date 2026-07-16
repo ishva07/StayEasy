@@ -2,14 +2,12 @@ import {Router} from "express"
 import { createHotelController, deletedHotelController, editHotelController, getHotelByIdController, getHotelController } from "./hotel.controller";
 import validate from "../../middleware/validate.middleware";
 import { createHotelSchema, editHotelSchema } from "./hotels.validate";
-import { authenticate } from "../../middleware/auth.middleware";
-import { hasPermission } from '../../middleware/permission.middleware';
-import { PERMISSIONS } from "../../constant/permissions";
+import { uploads } from '../../middleware/uploads.middleware';
 
 const hotelRoute = Router();
 
-hotelRoute.post("/",validate(createHotelSchema),createHotelController);
-hotelRoute.patch("/:id",validate(editHotelSchema),editHotelController);
+hotelRoute.post("/",uploads.single("heroImage"),validate(createHotelSchema),createHotelController);
+hotelRoute.patch("/:id",uploads.single("heroImage"),validate(editHotelSchema),editHotelController);
 hotelRoute.delete("/:id",deletedHotelController);
 hotelRoute.get("/:id",getHotelByIdController);
 hotelRoute.get("/",getHotelController);

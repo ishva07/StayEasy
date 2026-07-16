@@ -5,35 +5,39 @@ import ApiResponse from "../../utils/ApiResponse";
 
 
 export const createRoomsController = asyncHandler(async(req:Request,res:Response)=>{
-    const {name,capacity,price,hotelId} = req.body;
+    const {name,capacity,price} = req.body;
+    const hotelId = req.params.hotelId.toString();
     const roomImage = req.file ? `/uploads/${req.file.filename}` : null;
     const newRoom = await createRoomService({name,capacity,hotelId,price,roomImage});
     res.status(201).json(new ApiResponse(true,"Room Created Successfully",newRoom));
 })
 
 export const updateRoomController  = asyncHandler(async(req:Request,res:Response)=>{
-    const id = req.params.id.toString();
+    const hotelId = req.params.hotelId.toString();
+    const roomId = req.params.roomId.toString();
     const data = req.body;
-    const updatedRoom = await editRoomService(id,data);
+    const updatedRoom = await editRoomService(hotelId,roomId,data);
     res.status(200).json(new ApiResponse(true,"Room Updated Successfully",updatedRoom));
 })
 
 export const deleteRoomController = asyncHandler(async(req:Request,res:Response)=>{
-    const id = req.params.id.toString();
-    const deletedRoom = await deleteRoomService(id);
+    const hotelId = req.params.hotelId.toString();
+    const roomId = req.params.roomId.toString();
+    const deletedRoom = await deleteRoomService(hotelId,roomId);
     res.status(200).json(new ApiResponse(true,"Room Deleted Successfully.", deletedRoom));
 })
 
 
 export const getRoomByIdController = asyncHandler(async(req:Request,res:Response)=>{
-    const id = req.params.id.toString();
-    const getRoom = await getRoomByIdService(id);
+    const hotelId = req.params.hotelId.toString();
+    const roomId = req.params.roomId.toString();
+    const getRoom = await getRoomByIdService(hotelId,roomId);
     res.status(200).json(new ApiResponse(true,"Room Fetched Successfully.", getRoom));
 })
 
 
 export const getRoomController = asyncHandler(async(req:Request,res:Response)=>{
-    const hotelId = req.params.id.toString();
+    const hotelId = req.params.hotelId.toString();
     const page = Number(req.query.page || 1);
     const limit = Number(req.query.limit || 10);
     const sortBy = (req.query.sortBy || "createdAt").toString();
