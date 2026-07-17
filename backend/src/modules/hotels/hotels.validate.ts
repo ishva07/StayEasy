@@ -9,6 +9,16 @@ export const createHotelSchema = z.object({
     city: z.string(),
     address: z.string(),
     isFeatured: z.coerce.boolean().optional(),
+    amenitiesId: z.preprocess((val) => {
+      if (typeof val === "string") {
+        try {
+          return JSON.parse(val);
+        } catch {
+          return val;
+        }
+      }
+      return val;
+    }, z.array(z.string()).optional()),
   }),
 });
 

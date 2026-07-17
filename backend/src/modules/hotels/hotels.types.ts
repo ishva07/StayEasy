@@ -5,6 +5,7 @@ export interface CreateHotelInterface{
     address:string;
     isFeatured:boolean;
     heroImage:string;
+    amenitiesIds:string[];
 }
 
 export interface UpdateHotelInterface{
@@ -14,4 +15,5 @@ export interface UpdateHotelInterface{
     address?:string;
     isFeatured?:boolean;
     heroImage?:string;
+    amenitiesIds?:string[];
 }
