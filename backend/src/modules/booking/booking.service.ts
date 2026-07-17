@@ -172,3 +172,23 @@ export const getAllBookingsService = async (  { page = 1, limit = 10, sortBy = "
     totalPage: Math.ceil(total / limit),
   }
 }
+
+
+export const checkRoomAvailabilityService = async({roomId,checkIn,checkOut}:CreateBooking)=>{
+  const roomExist = await prisma.room.findUnique({where:{id:roomId}})
+  if(!roomExist)
+    throw new ApiError(404, "No Room Exist ");
+
+  const roomAvailable = await prisma.booking.findFirst({
+    where:{
+      roomId,
+      status:{not:"CANCELED"},
+      checkIn:{lt:checkOut},
+      checkOut:{gt:checkIn}
+    }
+  });
+  if(roomAvailable)
+    return false;
+
+  return true;
+}

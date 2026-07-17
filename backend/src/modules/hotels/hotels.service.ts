@@ -3,11 +3,25 @@ import ApiError from "../../utils/ApiError";
 import { CreateHotelInterface, UpdateHotelInterface } from "./hotels.types";
 
 export const createHotelsService = async(data:CreateHotelInterface) =>{
-    const hotelName = await prisma.hotel.findFirst({where:{name:data.name}})
-    if(hotelName)
-        throw new ApiError(409, "Hotel name already exist .. try different name")
+    const {amenitiesIds, ...hotelData} = data;
 
-    const newHotel = await prisma.hotel.create({data});
+    const hotelExist = await prisma.hotel.findFirst({where:{name:hotelData.name}});
+    if(hotelExist)
+        throw new ApiError(409, "already hotel exist with same name.");
+
+    const newHotel = await prisma.$transaction(async(tx)=>{
+        const hotel = await tx.hotel.create({data:hotelData});
+
+        if(amenitiesIds?.length){
+            await tx.hotelAmenities.createMany({
+                data:amenitiesIds.map((amenity:string)=>({
+                    hotelId:hotel.id,
+                    amenitiesId:amenity
+                }))
+            })
+        }
+        return hotel;
+    })
     return newHotel;
 }
 
