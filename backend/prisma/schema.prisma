@@ -68,7 +68,7 @@ model Hotel {
   isFeatured Boolean @default(false)
   room        Room[]
   hotelAmenities HotelAmenities[]
-  hotelImages HotelImages[]
+  imageGallery HotelImages[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

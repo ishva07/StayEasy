@@ -6,7 +6,7 @@ import { uploads } from '../../middleware/uploads.middleware';
 
 const hotelRoute = Router();
 
-hotelRoute.post("/",uploads.single("heroImage"),validate(createHotelSchema),createHotelController);
+hotelRoute.post("/",uploads.fields([{name:"heroImage",maxCount:1},{name:"imageGallery",maxCount:10}]),validate(createHotelSchema),createHotelController);
 hotelRoute.patch("/:id",uploads.single("heroImage"),validate(editHotelSchema),editHotelController);
 hotelRoute.delete("/:id",deletedHotelController);
 hotelRoute.get("/:id",getHotelByIdController);

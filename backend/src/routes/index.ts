@@ -5,6 +5,7 @@ import authRoute from "../modules/auth/auth.route";
 import bookingRoute from "../modules/booking/booking.routes";
 import hotelAmenities from "../modules/hotelAmenities/hotelAmenities.route";
 import amenities from "../modules/amenities/amenities.route";
+import hotelImages from "../modules/hotelImageGallery/imagesGalleryRoutes";
 
 const route = Router();
 
@@ -14,5 +15,6 @@ route.use("/hotels",roomRoute);
 route.use("/bookings",bookingRoute);
 route.use("/hotels",hotelAmenities);
 route.use("/amenities",amenities);
+route.use("/hotels",hotelImages);
 
 export default route;
