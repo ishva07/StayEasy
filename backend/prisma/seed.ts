@@ -3,7 +3,7 @@ import prisma from '../src/config/db';
 import { hashPassword } from '../src/utils/bcrypt';
 
 const ALLPERMISSION = Object.values(PERMISSIONS);
-const USERPERMISSSION = [PERMISSIONS.VIEW_HOTEL,PERMISSIONS.VIEW_ROOM];
+const USERPERMISSSION = [PERMISSIONS.VIEW_HOTEL,PERMISSIONS.VIEW_ROOM,PERMISSIONS.CANCEL_BOOKING,PERMISSIONS.VIEW_MY_BOOKING, PERMISSIONS.ADD_BOOKiNG];
 
 async function main(){
     // seed permission

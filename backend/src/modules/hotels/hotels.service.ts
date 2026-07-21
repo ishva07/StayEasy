@@ -42,7 +42,7 @@ export const editHotelsService=async(id:string, data:UpdateHotelInterface)=>{
         throw new ApiError(404,"No hotel available on given id")
 
     if(data.name){
-        const hotelExist = await prisma.hotel.findUnique({where:{id,name:data.name}})
+        const hotelExist = await prisma.hotel.findFirst({where:{name:data.name,NOT:{id}}})
     if(hotelExist)
         throw new ApiError(409, "Hotel name already exist on given id .. try different name")
     }
@@ -62,7 +62,12 @@ export const deleteHotelService = async(id:string)=>{
 }
 
 export const getHotelsByIdService = async(id:string)=>{
-    const hotelsById = await prisma.hotel.findUnique({where:{id}});
+    const hotelsById = await prisma.hotel.findUnique({where:{id},
+    include:{
+        room:true,
+        hotelAmenities:{include:{amenities:true}},
+        imageGallery:true
+    }});
     return hotelsById;
 }
 

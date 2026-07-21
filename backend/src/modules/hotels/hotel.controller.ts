@@ -26,7 +26,7 @@ export const createHotelController = asyncHandler(async (req: Request, res: Resp
 export const editHotelController = asyncHandler(async(req:Request,res:Response)=>{
     const id = req.params.id.toString();
     const {name,description,city,address,isFeatured} = req.body;
-    const heroImage = req.file? `/uploads/${req.file.filename}` : "" 
+    const heroImage = req.file? `/uploads/${req.file.filename}` : undefined;
 
     const updatedHotel = await editHotelsService(id,{name,description,city,address,isFeatured,heroImage})
     res.status(200).json(new ApiResponse(true,"hotel updated successfully",updatedHotel));

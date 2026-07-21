@@ -39,6 +39,17 @@ export const loginAuthService = async (data: LoginUserInterface) => {
 
   const userData = await prisma.user.findFirst({
     where: { email: emailExist.email },
+    include:{
+      role:{
+        include:{
+          permissions:{
+            include:{
+              permission:true
+            }
+          }
+        }
+      }
+    }
   });
 
   const token = generateToken({
@@ -48,7 +59,12 @@ export const loginAuthService = async (data: LoginUserInterface) => {
 
   return {
     token,
-    userData,
+    userData:{
+      id:userData?.id,
+      email:userData?.email,
+      roleId:userData?.role.name,
+      permission:userData?.role.permissions.map((permission:any)=>permission.permission.name)
+    },
   };
 };
 
