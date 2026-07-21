@@ -3,7 +3,7 @@ import ApiError from "../../utils/ApiError";
 import { CreateHotelInterface, UpdateHotelInterface } from "./hotels.types";
 
 export const createHotelsService = async(data:CreateHotelInterface) =>{
-    const {amenitiesIds, ...hotelData} = data;
+    const {amenitiesIds,imageGallery, ...hotelData} = data;
 
     const hotelExist = await prisma.hotel.findFirst({where:{name:hotelData.name}});
     if(hotelExist)
@@ -20,8 +20,18 @@ export const createHotelsService = async(data:CreateHotelInterface) =>{
                 }))
             })
         }
+
+        if(imageGallery?.length){
+            await tx.hotelImages.createMany({
+                data:imageGallery.map((url:string)=>({
+                    url,
+                    hotelId:hotel.id
+                }))
+            })
+        }
         return hotel;
-    })
+    });
+
     return newHotel;
 }
 

@@ -9,7 +9,7 @@ export const createHotelSchema = z.object({
     city: z.string(),
     address: z.string(),
     isFeatured: z.coerce.boolean().optional(),
-    amenitiesId: z.preprocess((val) => {
+    amenitiesIds: z.preprocess((val) => {
       if (typeof val === "string") {
         try {
           return JSON.parse(val);
