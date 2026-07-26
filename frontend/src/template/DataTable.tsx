@@ -89,7 +89,7 @@ export function DataTable<TData, TValue>({
                         >
                           {flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                           {sortDir === "asc" && (
                             <ArrowUp className="h-3.5 w-3.5" />
@@ -104,7 +104,7 @@ export function DataTable<TData, TValue>({
                       ) : (
                         flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )
                       )}
                     </TableHead>
@@ -129,7 +129,10 @@ export function DataTable<TData, TValue>({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -185,7 +188,7 @@ export function DataTable<TData, TValue>({
             variant="outline"
             size="icon"
             className="h-8 w-8"
-            onClick={() => table.setPageIndex(pageCount - 1)}
+            onClick={() => table.setPageIndex(Math.max(pageCount - 1, 0))}
             disabled={!table.getCanNextPage()}
           >
             <ChevronsRight className="h-4 w-4" />
