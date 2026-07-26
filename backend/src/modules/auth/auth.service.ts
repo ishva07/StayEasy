@@ -62,7 +62,7 @@ export const loginAuthService = async (data: LoginUserInterface) => {
     userData:{
       id:userData?.id,
       email:userData?.email,
-      roleId:userData?.role.name,
+      role:userData?.role.name,
       permission:userData?.role.permissions.map((permission:any)=>permission.permission.name)
     },
   };
