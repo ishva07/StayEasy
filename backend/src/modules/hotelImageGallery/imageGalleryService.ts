@@ -27,5 +27,6 @@ export const updateHotelImageService = async(hotelId:string, urls:string[]) =>{
         })
     ]);
 
-    return updatedImages;
+    const updatedGalleryImage = await prisma.hotelImages.findMany({where:{hotelId},select:{url:true}})
+    return updatedGalleryImage;
 }

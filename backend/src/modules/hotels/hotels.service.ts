@@ -52,9 +52,9 @@ export const editHotelsService=async(id:string, data:UpdateHotelInterface)=>{
 }
 
 export const deleteHotelService = async(id:string)=>{
-     const hotelId = await prisma.hotel.findUnique({where:{id}})
+     const hotel = await prisma.hotel.findFirst({where:{id},select:{room:true}})
 
-    if(!hotelId)
+    if(!hotel)
         throw new ApiError(404,"No hotel available on given id")
 
     const deletedHotel = await prisma.hotel.delete({where:{id}})

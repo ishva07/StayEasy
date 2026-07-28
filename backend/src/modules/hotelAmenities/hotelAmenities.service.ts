@@ -15,6 +15,6 @@ export const updateAmenitiesService = async (hotelId: string, amenitiesId: strin
     }),
   ]);
 
-const updatedAmenities = await prisma.hotelAmenities.findFirst({where:{hotelId},select:{amenities:{select:{name:true}}}})
+const updatedAmenities = await prisma.hotelAmenities.findMany({where:{hotelId},select:{amenities:{select:{name:true}}}})
   return updatedAmenities;
 };
