@@ -23,7 +23,7 @@ interface FormModalProps {
 
   isSubmitting?: boolean;
 
-  submitText?: string;
+  submitText?: string; 
   cancelText?: string;
   submittingText?: string;
 

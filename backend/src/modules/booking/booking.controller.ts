@@ -37,7 +37,7 @@ export const cancelBookingController = asyncHandler(
 export const changeBookingStatusController = asyncHandler(
   async (req: Request, res: Response) => {
     const bookingId = req.params.bookingId.toString();
-    const status = req.body;
+    const {status} = req.body;
 
     const changedStatus = await changeBookingStatusService(bookingId, status);
     res

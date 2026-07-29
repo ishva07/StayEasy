@@ -42,6 +42,7 @@ export function HotelForm({
             address: "",
             isFeatured: false,
             amenitiesIds: [],
+            heroImage: undefined,
             imageGallery: [],
             ...defaultValues,
         },
@@ -58,8 +59,7 @@ export function HotelForm({
                             <FormLabel>Hotel Name</FormLabel>
                             <FormControl>
                                 <Input placeholder="e.g. Hotel Taj" {...field} />
-                            </FormControl>
-                            <FormMessage />
+                            </FormControl> 
                         </FormItem>
                     )}
                 />

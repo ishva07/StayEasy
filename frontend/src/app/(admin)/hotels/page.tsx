@@ -37,6 +37,7 @@ export default function HotelsPage() {
     const columns = getHotelColumns({
         onEdit: (hotel) => router.push(`/hotels/${hotel.id}/edit`),
         onView: (hotel) => router.push(`/hotels/${hotel.id}`),
+        onViewRooms: (hotel) => router.push(`/hotels/${hotel.id}/rooms`),
         onDelete: (hotel) => setHotelToDelete(hotel),
     });
 

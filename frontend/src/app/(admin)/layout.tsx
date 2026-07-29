@@ -40,7 +40,6 @@ export default function AdminLayout({
       isLoggingOut={isLoggingOut}
       navItems={[
         { label: "Hotels", href: "/hotels", icon: Hotel },
-        { label: "Rooms", href: "/rooms", icon: BedDouble },
         { label: "Bookings", href: "/bookings", icon: CalendarCheck },
       ]}
     >
