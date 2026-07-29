@@ -7,7 +7,7 @@ export const createHotelSchema = z.object({
   address: z.string().min(1, "Address is required"),
   isFeatured: z.boolean().optional(),
   amenitiesIds: z.array(z.string()).optional(),
-  heroImage: z.instanceof(File, { message: "Hero image is required" }),   // 👈 add karo
+  heroImage: z.instanceof(File, { message: "Hero image is required" }),
   imageGallery: z.array(z.instanceof(File)).optional(),
 });
 

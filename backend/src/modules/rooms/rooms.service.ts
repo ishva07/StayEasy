@@ -107,6 +107,7 @@ export const getRoomService = async (
       skip,
       take: limit,
       orderBy: { [sortedBy]: sortOrder },
+      where:{hotelId},
       include: {
         hotel: {
           select: {

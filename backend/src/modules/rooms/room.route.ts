@@ -7,7 +7,7 @@ import { uploads } from '../../middleware/uploads.middleware';
 const roomRoute = Router();
 
 roomRoute.post("/:hotelId/rooms",uploads.single("roomImage"),validate(createRoomSchema),createRoomsController);
-roomRoute.patch("/:hotelId/rooms/:roomId",validate(editRoomSchema),updateRoomController);
+roomRoute.patch("/:hotelId/rooms/:roomId",uploads.single("roomImage"),validate(editRoomSchema),updateRoomController);
 roomRoute.delete("/:hotelId/rooms/:roomId",deleteRoomController);
 roomRoute.get("/:hotelId/rooms",getRoomController);
 roomRoute.get("/:hotelId/rooms/:roomId",getRoomByIdController);
