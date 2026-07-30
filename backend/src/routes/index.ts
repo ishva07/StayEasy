@@ -6,6 +6,7 @@ import bookingRoute from "../modules/booking/booking.routes";
 import hotelAmenities from "../modules/hotelAmenities/hotelAmenities.route";
 import amenities from "../modules/amenities/amenities.route";
 import hotelImages from "../modules/hotelImageGallery/imagesGalleryRoutes";
+import dashboardRoute from "../modules/dashboard/dashboard.route";
 
 const route = Router();
 
@@ -16,5 +17,6 @@ route.use("/bookings",bookingRoute);
 route.use("/hotels",hotelAmenities);
 route.use("/amenities",amenities);
 route.use("/hotels",hotelImages);
+route.use("/dashboard",dashboardRoute);
 
 export default route;

@@ -169,7 +169,7 @@ export const getAllBookingsService = async (  { page = 1, limit = 10, sortBy = "
     total,
     page,
     limit,
-    totalPage: Math.ceil(total / limit),
+    totalPages: Math.ceil(total / limit),
   }
 }
 

@@ -9,6 +9,6 @@ export const bookingService = {
 
     getAllBooking : async(page=1,limit=10,sortBy="createdAt",order="desc")=>{
         const res = await api.get(`/bookings`,{params:{page,limit,sortBy,order}});
-        return res.data.data.data;
+        return res.data.data;
     }
 }

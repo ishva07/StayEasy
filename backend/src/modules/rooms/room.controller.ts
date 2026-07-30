@@ -15,7 +15,15 @@ export const createRoomsController = asyncHandler(async(req:Request,res:Response
 export const updateRoomController  = asyncHandler(async(req:Request,res:Response)=>{
     const hotelId = req.params.hotelId.toString();
     const roomId = req.params.roomId.toString();
-    const data = req.body;
+    const {name,price,capacity} = req.body;
+    const data:any ={};
+      if (name !== undefined) data.name = name;
+      if(price != undefined) data.price = Number(price);
+      if(capacity != undefined) data.capacity = Number(capacity);
+
+      if(req.file)
+        data.roomImage = `/uploads/${req.file.filename}`
+
     const updatedRoom = await editRoomService(hotelId,roomId,data);
     res.status(200).json(new ApiResponse(true,"Room Updated Successfully",updatedRoom));
 })
