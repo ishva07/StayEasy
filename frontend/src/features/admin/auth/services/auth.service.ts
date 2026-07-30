@@ -13,5 +13,10 @@ export const authService = {
     return response.data.data;
   },
 
-  logoutApi: () => api.post("/auth/logout")
+  logoutApi: () => api.post("/auth/logout"),
+
+  register: async (data: { email: string; password: string }) => {
+    const res = await api.post("/auth/register", data);
+    return res.data.data;
+  },
 };

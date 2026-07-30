@@ -32,7 +32,7 @@ export default function AdminLayout({
 
   if (!isFetched) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="theme-admin flex h-screen items-center justify-center">
         Loading...
       </div>
     );
@@ -43,30 +43,32 @@ export default function AdminLayout({
   }
 
   return (
-    <DashboardLayout
-      appName="Stay Easy"
-      user={{ email: user.email, role: user.role }}
-      onLogout={() => logout()}
-      isLoggingOut={isLoggingOut}
-      navItems={[
-        {
-          label: "Dashboard",
-          href: "/dashboard",
-          icon: LayoutDashboard,
-        },
-        {
-          label: "Hotels",
-          href: "/hotels",
-          icon: Building2,
-        },
-        {
-          label: "Bookings",
-          href: "/bookings",
-          icon: CalendarCheck,
-        },
-      ]}
-    >
-      {children}
-    </DashboardLayout>
+    <div className="theme-admin">
+      <DashboardLayout
+        appName="Stay Easy"
+        user={{ email: user.email, role: user.role }}
+        onLogout={() => logout()}
+        isLoggingOut={isLoggingOut}
+        navItems={[
+          {
+            label: "Dashboard",
+            href: "/dashboard",
+            icon: LayoutDashboard,
+          },
+          {
+            label: "Hotels",
+            href: "/hotels",
+            icon: Building2,
+          },
+          {
+            label: "Bookings",
+            href: "/bookings",
+            icon: CalendarCheck,
+          },
+        ]}
+      >
+        {children}
+      </DashboardLayout>
+    </div>
   );
 }
