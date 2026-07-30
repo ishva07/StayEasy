@@ -33,6 +33,8 @@ import {
 import {
   createRoomSchema,
   createRoomFormInput,
+  updateRoomFormInput,
+  updateRoomSchema,
 } from "@/features/admin/rooms/validation/rooms.validation";
 
 export default function RoomsPage() {
@@ -62,42 +64,47 @@ export default function RoomsPage() {
   const { updateRoom, isPending: isUpdating } = useUpdateRoom();
   const [formOpen, setFormOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null); 
   const isSubmitting = isCreating || isUpdating;
 
-  const form = useForm<createRoomFormInput>({
-    resolver: zodResolver(createRoomSchema),
-    defaultValues: { name: "", capacity: 1, price: 0 },
-  });
-
+ const form = useForm<createRoomFormInput | updateRoomFormInput>({
+  resolver: zodResolver(editingRoom ? updateRoomSchema : createRoomSchema), 
+  defaultValues: { name: "", capacity: 1, price: 0 },
+});
   const openCreateForm = () => {
     form.reset({ name: "", capacity: 1, price: 0 });
     setEditingRoom(null);
+    setImagePreview(null); 
     setFormOpen(true);
   };
 
   const openEditForm = (room: Room) => {
     form.reset({
-      name: room.name,
-      capacity: room.capacity,
-      price: Number(room.price),
-    });
+  name: room.name,
+  capacity: room.capacity,
+  price: Number(room.price),
+  roomImage: undefined,  
+});
     setEditingRoom(room);
+    setImagePreview(
+      room.roomImage ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${room.roomImage}` : null
+    );
     setFormOpen(true);
   };
 
-  const handleFormSubmit = (formData: createRoomFormInput) => {
-    if (editingRoom) {
-      updateRoom(
-        { hotelId, roomId: editingRoom.id, data: formData },
-        { onSuccess: () => setFormOpen(false) },
-      );
-    } else {
-      createRoom(
-        { hotelId, data: formData },
-        { onSuccess: () => setFormOpen(false) },
-      );
-    }
-  };
+const handleFormSubmit = (formData: updateRoomFormInput) => {
+  if (editingRoom) {
+    updateRoom(
+      { hotelId, roomId: editingRoom.id, data: formData },
+      { onSuccess: () => setFormOpen(false) },
+    );
+  } else {
+    createRoom(
+      { hotelId, data: formData as createRoomFormInput },
+      { onSuccess: () => setFormOpen(false) },
+    );
+  }
+};
 
   const handleConfirmDelete = () => {
     if (!roomToDelete) return;
@@ -117,7 +124,7 @@ export default function RoomsPage() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => router.push(`/hotels/${hotelId}`)}
+        onClick={() => router.push(`/hotels`)}
       >
         <ArrowLeft className="h-4 w-4 mr-1" /> Back to Hotel
       </Button>
@@ -209,16 +216,38 @@ export default function RoomsPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Room Image</FormLabel>
+
+                  {imagePreview && (
+                    <div className="mb-2 h-20 w-28 rounded-md overflow-hidden bg-muted">
+                      <img
+                        src={imagePreview}
+                        alt="Room preview"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  )}
+
                   <FormControl>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        field.onChange(e.target.files?.[0] ?? null)
-                      }
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        const file = e.target.files?.[0] ?? null;
+                        field.onChange(file);
+                        if (file) {
+                          setImagePreview(URL.createObjectURL(file)); // 👈 naya file select hote hi preview refresh
+                        }
+                      }}
                       className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
                     />
                   </FormControl>
+
+                  {editingRoom && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Leave empty to keep the current image
+                    </p>
+                  )}
+
                   <FormMessage />
                 </FormItem>
               )}

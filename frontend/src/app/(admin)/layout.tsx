@@ -4,7 +4,13 @@ import { useMe } from "@/features/admin/auth/hooks/useMe";
 import { useLogout } from "@/features/admin/auth/hooks/useLogout";
 import { useAuthStore } from "@/stores/authStore";
 import { DashboardLayout } from "@/template/dashboard-page";
-import { BedDouble, CalendarCheck, Hotel } from "lucide-react";
+import {
+  BedDouble,
+  Building2,
+  CalendarCheck,
+  Hotel,
+  LayoutDashboard,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -25,7 +31,11 @@ export default function AdminLayout({
   }, [isFetched, isError]);
 
   if (!isFetched) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   if (isError || !user) {
@@ -39,8 +49,21 @@ export default function AdminLayout({
       onLogout={() => logout()}
       isLoggingOut={isLoggingOut}
       navItems={[
-        { label: "Hotels", href: "/hotels", icon: Hotel },
-        { label: "Bookings", href: "/bookings", icon: CalendarCheck },
+        {
+          label: "Dashboard",
+          href: "/dashboard",
+          icon: LayoutDashboard,
+        },
+        {
+          label: "Hotels",
+          href: "/hotels",
+          icon: Building2,
+        },
+        {
+          label: "Bookings",
+          href: "/bookings",
+          icon: CalendarCheck,
+        },
       ]}
     >
       {children}
