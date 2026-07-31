@@ -11,7 +11,8 @@ export const hasPermission = (...requiredPermissions:string[])=>
 
     const userPermissions = user.role.permissions.map((rp:any)=>rp.permission.name);
 
-    const hasPermissions = userPermissions.includes(requiredPermissions);
+    const hasPermissions = requiredPermissions.every(permission => userPermissions.includes(permission));
+
 
     if(!hasPermissions)
         throw new ApiError(403,"User does not have permissions to access this.");

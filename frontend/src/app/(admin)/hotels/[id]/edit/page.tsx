@@ -7,8 +7,10 @@ import { useEditHotels } from "@/features/admin/hotel/hooks/useEditHotel";
 import { useUpdateHotelAmenities } from "@/features/admin/hotelAmenities/hooks/useHotelAmenities.hooks";
 import { useUpdateHotelImageGallery } from "@/features/admin/hotelImageGallery/hooks/useUpdateHotelImageGallery.hook";
 import { editHotelInputData } from "@/features/admin/hotel/validation/hotel.validation";
+import { ProtectedRoute } from "@/features/admin/auth/components/ProtectedRoute";
+import { PERMISSIONS } from "@/constants/permissions";
 
-export default function EditHotelPage() {
+export function EditHotelContent() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
 
@@ -54,25 +56,33 @@ export default function EditHotelPage() {
     <div className="max-w-2xl space-y-4">
       <h1 className="text-xl font-semibold">Edit Hotel</h1>
       <HotelForm
-        mode="edit"                                                          // ✅ dynamic resolver trigger
+        mode="edit"                                                          
         defaultValues={{
           name: hotel.name,
           description: hotel.description,
           city: hotel.city,
           address: hotel.address,
           isFeatured: hotel.isFeatured,
-          amenitiesIds: hotel.hotelAmenities?.map((ha: any) => ha.amenitiesId) ?? [], // ✅ prefill checked
+          amenitiesIds: hotel.hotelAmenities?.map((ha: any) => ha.amenitiesId) ?? [],
         }}
         initialHeroImageUrl={
           hotel.heroImage ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}` : null
-        } // ✅ hero preview
+        } 
         initialGalleryUrls={
           hotel.imageGallery?.map((img: any) => `${process.env.NEXT_PUBLIC_UPLOADS_URL}${img.url}`) ?? []
-        } // ✅ gallery preview
+        } 
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel="Update Hotel"
       />
     </div>
   );
+}
+
+export default function EditHotelPage(){
+  return(
+    <ProtectedRoute requiredPermission={PERMISSIONS.EDIT_HOTEL}>
+    <EditHotelContent />
+  </ProtectedRoute>
+  )
 }

@@ -5,7 +5,7 @@ export interface AuthUser{
     id:string;
     email:string;
     role:string;
-    permission:string[];
+    permissions:string[];
 }
 
 interface AuthState{

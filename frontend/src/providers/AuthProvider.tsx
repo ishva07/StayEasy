@@ -3,24 +3,20 @@
 import { useEffect, useState } from "react";
 import { useMe } from "@/features/admin/auth/hooks/useMe";
 import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isRehydrated, setIsRehydrated] = useState(false);
-    const router = useRouter();
 
     const setUser = useAuthStore((state) => state.setUser);
     const clearUser = useAuthStore((state) => state.clearUser);
 
     const { data: user, isSuccess, isError, isFetched } = useMe();
 
-    // Step 1: Zustand persist ko manually rehydrate karo (skipHydration: true tha)
     useEffect(() => {
         useAuthStore.persist.rehydrate();
         setIsRehydrated(true);
     }, []);
 
-    // Step 2: server se verify hone ke baad Zustand ko sync karo
     useEffect(() => {
         if (isSuccess && user) {
             setUser(user);
@@ -30,20 +26,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (isError) {
             clearUser();
-             if (window.location.pathname !== "/login") {
-            router.push("/login");  
-        }
+            // 👈 router.push HATA DIYA — guest ko yahin rehne do, redirect ka faisla
+            // page-level ProtectedRoute lega, AuthProvider nahi
         }
     }, [isError]);
 
-    // Jab tak rehydration + server verification dono complete na ho, kuch mat dikhao
-    if (!isRehydrated || !isFetched) {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <span className="text-sm text-muted-foreground">Loading...</span>
-            </div>
-        );
-    }
+    // 👈 poora app block karne wala loading screen bhi HATA DIYA
+    // guest pages turant render honi chahiye, useMe() ka wait kiye bina
 
     return <>{children}</>;
 }

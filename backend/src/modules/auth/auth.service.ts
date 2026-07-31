@@ -87,7 +87,7 @@ export const meService = async (userId: string) => {
     id: userExist.id,
     email: userExist.email,
     role: userExist.role.name,
-    permission: userExist.role.permissions.map((permission:any)=>(permission.permission.name)),
+    permissions: userExist.role.permissions.map((permission:any)=>(permission.permission.name)),
   };
   return user;
 };

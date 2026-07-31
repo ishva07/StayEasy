@@ -10,9 +10,14 @@ import { getHotelColumns } from "@/features/admin/hotel/components/hotel-columns
 import { Hotel } from "@/features/admin/hotel/types/hotel.types";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { usePermission } from "@/hooks/usePermission";
+import { PERMISSIONS } from "@/constants/permissions";
+import { ProtectedRoute } from "@/features/admin/auth/components/ProtectedRoute";
 
-export default function HotelsPage() {
+export function HotelsContent() {
     const router = useRouter();
+    const { hasPermission } = usePermission();
+
 
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
@@ -33,13 +38,19 @@ export default function HotelsPage() {
     const { deleteHotel, isPending: isDeleting } = useDeleteHotel();
 
     const [hotelToDelete, setHotelToDelete] = useState<Hotel | null>(null);
+    
+    const canEdit = hasPermission(PERMISSIONS.EDIT_HOTEL);
+    const canViewRooms = hasPermission(PERMISSIONS.VIEW_ROOM);
+    const canDelete= hasPermission(PERMISSIONS.DELETE_HOTEL)
 
+   
     const columns = getHotelColumns({
-        onEdit: (hotel) => router.push(`/hotels/${hotel.id}/edit`),
         onView: (hotel) => router.push(`/hotels/${hotel.id}`),
-        onViewRooms: (hotel) => router.push(`/hotels/${hotel.id}/rooms`),
-        onDelete: (hotel) => setHotelToDelete(hotel),
+        onEdit: canEdit ? (hotel) => router.push(`/hotels/${hotel.id}/edit`) : undefined,
+        onViewRooms: canViewRooms ? (hotel) => router.push(`/hotels/${hotel.id}/rooms`) : undefined,
+        onDelete: canDelete ? (hotel) => setHotelToDelete(hotel) : undefined,
     });
+
 
     const handleConfirmDelete = () => {
         if (!hotelToDelete) return;
@@ -52,7 +63,9 @@ export default function HotelsPage() {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Hotels</h1>
-                <Button onClick={() => router.push("/hotels/new")}>Add Hotel</Button>
+                {hasPermission(PERMISSIONS.ADD_HOTEL) &&(
+                    <Button onClick={() => router.push("/hotels/new")}>Add Hotel</Button>
+                )}
             </div>
 
             <DataTable
@@ -66,14 +79,24 @@ export default function HotelsPage() {
                 isLoading={isLoading}
             />
 
-            <ConfirmDialog
+           {canDelete && 
+            (<ConfirmDialog
                 open={!!hotelToDelete}
                 onOpenChange={(open) => !open && setHotelToDelete(null)}
                 title="Delete this hotel?"
                 description={`"${hotelToDelete?.name}" will be permanently deleted. This cannot be undone.`}
                 loading={isDeleting}
                 onConfirm={handleConfirmDelete}
-            />
+            />)
+            }
         </div>
+    );
+}
+
+export default function HotelsPage() {
+    return (
+        <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_HOTEL}>
+            <HotelsContent />
+        </ProtectedRoute>
     );
 }

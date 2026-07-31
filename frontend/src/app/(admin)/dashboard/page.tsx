@@ -16,6 +16,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useDashboardOverview } from "../../../features/admin/dashboard/hooks/useDashboardStats";
 import { useRecentActivity } from "../../../features/admin/dashboard/hooks/useGetRecentHotels";
+import { ProtectedRoute } from "@/features/admin/auth/components/ProtectedRoute";
+import { PERMISSIONS } from "@/constants/permissions";
 
 const STATUS_COLORS: Record<string, string> = {
   CONFIRMED: "#3b82f6",
@@ -33,7 +35,7 @@ const STATUS_BADGE: Record<string, string> = {
   CHECKOUT: "bg-purple-100 text-purple-700",
 };
 
-export default function Dashboard() {
+export function DashboardContent() {
   const router = useRouter();
   const { stats, monthlyBookings, bookingStatus, isLoading } = useDashboardOverview();
   const { recentHotels, recentBookings } = useRecentActivity();
@@ -184,4 +186,12 @@ export default function Dashboard() {
      
     </div>
   );
+}
+
+export default function Dashboard(){
+      return (
+         <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_DASHBOARD}>
+          <DashboardContent />
+        </ProtectedRoute>
+        )
 }
