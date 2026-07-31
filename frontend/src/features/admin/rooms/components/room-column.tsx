@@ -15,8 +15,8 @@ export interface Room {
 }
 
 interface GetColumnsProps {
-  onEdit: (room: Room) => void;
-  onDelete: (room: Room) => void;
+  onEdit?: (room: Room) => void;
+  onDelete?: (room: Room) => void;
 }
 
 export function getRoomColumns({
@@ -65,20 +65,21 @@ export function getRoomColumns({
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
+         {onEdit &&(
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onEdit(row.original)}
           >
             <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
+          </Button>)}
+         {onDelete &&( <Button
             variant="ghost"
             size="icon"
             onClick={() => onDelete(row.original)}
           >
             <Trash2 className="h-4 w-4 text-red-600" />
-          </Button>
+          </Button>)}
         </div>
       ),
     },

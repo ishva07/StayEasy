@@ -18,3 +18,5 @@ export const PERMISSIONS={
     VIEW_IMAGE_GALLERY:"view_image_gallery",
     EDIT_IMAGE_GALLERY:"edit_image_gallery"
 }as const;
+
+export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

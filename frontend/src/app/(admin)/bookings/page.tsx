@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { PaginationState,SortingState  } from "@tanstack/react-table";
+import { PaginationState, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/template/DataTable";
+import { ProtectedRoute } from "@/features/admin/auth/components/ProtectedRoute";
+import { PERMISSIONS } from "@/constants/permissions";
+import { usePermission } from "@/hooks/usePermission";
 import { useGetAllBookings } from "@/features/admin/booking/hooks/useGetAllBookings";
 import { useChangeBookingStatus } from "@/features/admin/booking/hooks/useChangeBooking";
 import { getBookingColumns } from "@/features/admin/booking/components/booking-column";
 import { BookingStatus } from "@/features/admin/booking/types/booking.type";
 
-
-export default function BookingsPage() {
+function BookingsContent() {
     const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
-    const [sorting, setSorting] = useState<SortingState>([]);  
+    const [sorting, setSorting] = useState<SortingState>([]);
 
-    const sortBy = sorting[0]?.id ?? "createdAt";               
+    const sortBy = sorting[0]?.id ?? "createdAt";
     const order = sorting[0]?.desc ? "desc" : "asc";
 
     const { data, isLoading } = useGetAllBookings(
@@ -24,6 +26,7 @@ export default function BookingsPage() {
     );
 
     const { changeBookingStatus, isPending: isUpdating } = useChangeBookingStatus();
+    const { hasPermission } = usePermission();
 
     const handleStatusChange = (bookingId: string, status: BookingStatus) => {
         changeBookingStatus({ bookingId, status });
@@ -32,6 +35,7 @@ export default function BookingsPage() {
     const columns = getBookingColumns({
         onStatusChange: handleStatusChange,
         isUpdating,
+        canChangeStatus: hasPermission(PERMISSIONS.CHANGE_BOOKiNG_STATUS), 
     });
 
     return (
@@ -49,5 +53,13 @@ export default function BookingsPage() {
                 isLoading={isLoading}
             />
         </div>
+    );
+}
+
+export default function BookingsPage() {
+    return (
+        <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_BOOKiNG}>
+            <BookingsContent />
+        </ProtectedRoute>
     );
 }

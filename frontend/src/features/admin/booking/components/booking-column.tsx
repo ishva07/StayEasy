@@ -27,7 +27,6 @@ export interface Booking {
     };
 }
 
-// same state machine as backend — only show valid next statuses
 const validTransitions: Record<BookingStatus, BookingStatus[]> = {
     PENDING: ["CONFIRMED", "CANCELED"],
     CONFIRMED: ["CHECKIN", "CANCELED"],
@@ -47,9 +46,10 @@ const statusColors: Record<BookingStatus, string> = {
 interface GetColumnsProps {
     onStatusChange: (bookingId: string, status: BookingStatus) => void;
     isUpdating?: boolean;
+    canChangeStatus?: boolean;  
 }
 
-export function getBookingColumns({ onStatusChange, isUpdating }: GetColumnsProps): ColumnDef<Booking>[] {
+export function getBookingColumns({ onStatusChange, isUpdating, canChangeStatus = false }: GetColumnsProps): ColumnDef<Booking>[] {
     return [
         {
             accessorKey: "room",
@@ -85,8 +85,7 @@ export function getBookingColumns({ onStatusChange, isUpdating }: GetColumnsProp
                 const currentStatus = row.original.status;
                 const nextOptions = validTransitions[currentStatus];
 
-                if (nextOptions.length === 0) {
-                    // terminal state — no further transitions allowed, just show badge
+                if (!canChangeStatus || nextOptions.length === 0) {
                     return <Badge className={statusColors[currentStatus]}>{currentStatus}</Badge>;
                 }
 
