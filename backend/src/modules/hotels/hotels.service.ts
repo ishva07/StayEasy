@@ -71,30 +71,71 @@ export const getHotelsByIdService = async(id:string)=>{
     return hotelsById;
 }
 
-export const getHotelService = async({page=1,limit=10,sortBy="createdAt",order="desc",search=""})=>{
-    const skip = (page-1)*limit;
+export const getHotelService = async ({
+  page = 1,
+  limit = 10,
+  sortBy = "createdAt",
+  order = "desc",
+  search = "",
+  featured,
+  amenityIds,   // 👈 naya - comma-separated ya array
+}: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  order?: string;
+  search?: string;
+  featured?: string;
+  amenityIds?: string;
+}) => {
+  const skip = (page - 1) * limit;
 
-//    const where = search ? {
-//     OR:[
-//         {name:{contains:search,mode:"insensitive" as const}},
-//         {description:{contains:search,mode:"insensitive" as const}}
-//     ]
-//    } : {}
+  const where: any = {};
 
-    const [ data, total] = await Promise.all([
-        prisma.hotel.findMany({
-            skip,
-            take:limit,
-            orderBy:{[sortBy]:order}
-        }),
-        prisma.hotel.count()
-    ])
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: "insensitive" } },
+      { city: { contains: search, mode: "insensitive" } },
+    ];
+  }
 
-    return{
-        data,
-        total,
-        page,
-        limit,
-        totalPages:Math.ceil(total/limit)
-    }
-}
+  if (featured === "true") {
+    where.isFeatured = true;
+  }
+
+  if (amenityIds) {
+    const idsArray = amenityIds.split(",");   // "id1,id2,id3" → ["id1","id2","id3"]
+    where.hotelAmenities = {
+      some: {
+        amenitiesId: { in: idsArray },
+      },
+    };
+  }
+
+  const allowedSortBy = ["name", "createdAt", "city"];
+  const sortByFilter = allowedSortBy.includes(sortBy) ? sortBy : "createdAt";
+
+  const allowedOrder = ["asc", "desc"];
+  const orderFilter = allowedOrder.includes(order) ? order : "desc";
+
+  const [data, total] = await Promise.all([
+    prisma.hotel.findMany({
+      skip,
+      take: limit,
+      where,
+      orderBy: { [sortByFilter]: orderFilter },
+      include: {
+        hotelAmenities: { include: { amenities: true } }, 
+      },
+    }),
+    prisma.hotel.count({ where }),
+  ]);
+
+  return {
+    data,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+};

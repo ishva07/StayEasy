@@ -1,16 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { LoginForm } from "@/features/admin/auth/components/LoginForm";
+import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export default function LoginPage() {
   const router = useRouter();
 
   const handleSuccess = (user: any) => {
-    if (user?.role === "admin") {   // aapke backend mein role name "user"/"admin" hai (Role table se) - naam confirm kar lena
-      router.push("/dashboard");
+      console.log("LOGIN SUCCESS - role received:", user?.role, user); 
+
+    if (user?.role === "admin") {   
+      router.push("/admin/dashboard");
     } else {
-      router.push("/");
+      router.push(`/`);
     }
   };
 
