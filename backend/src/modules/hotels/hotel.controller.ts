@@ -45,14 +45,15 @@ export const getHotelByIdController = asyncHandler(async(req:Request,res:Respons
     res.status(200).json(new ApiResponse(true,"Hotel fetched successfully.",getHotelById))
 })
 
-export const getHotelController = asyncHandler(async(req:Request,res:Response)=>{
+export const getHotelController = asyncHandler(async (req: Request, res: Response) => {
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 10);
+  const sortBy = (req.query.sortBy || "createdAt").toString();
+  const order = (req.query.order || "desc").toString();
+  const search = (req.query.search || "").toString();
+  const featured = req.query.featured?.toString();
+  const amenityIds = req.query.amenityIds?.toString();
 
-    const page = Number(req.query.page || 1);
-    const limit = Number(req.query.limit || 10);
-    const sortBy = (req.query.sortBy || "createdAt").toString();
-    const order = (req.query.order || "desc").toString();
-    const search = (req.query.search || "").toString();
-
-    const getHotels = await getHotelService({page,limit,sortBy,order,search})
-    res.status(200).json(new ApiResponse(true,"Hotel fetched successfully.",getHotels))
-})
+  const getHotels = await getHotelService({ page, limit, sortBy, order, search, featured, amenityIds });
+  res.status(200).json(new ApiResponse(true, "Hotel fetched successfully.", getHotels));
+});
