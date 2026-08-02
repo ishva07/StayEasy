@@ -78,7 +78,7 @@ export const getHotelService = async ({
   order = "desc",
   search = "",
   featured,
-  amenityIds,   // 👈 naya - comma-separated ya array
+  amenityIds, 
 }: {
   page?: number;
   limit?: number;
@@ -104,7 +104,7 @@ export const getHotelService = async ({
   }
 
   if (amenityIds) {
-    const idsArray = amenityIds.split(",");   // "id1,id2,id3" → ["id1","id2","id3"]
+    const idsArray = amenityIds.split(",");   
     where.hotelAmenities = {
       some: {
         amenitiesId: { in: idsArray },
