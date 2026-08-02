@@ -192,3 +192,10 @@ export const checkRoomAvailabilityService = async({roomId,checkIn,checkOut}:Crea
 
   return true;
 }
+
+export const getBookingByIdService = async(bookingId:string,userIds:string) =>{
+        const booking = await prisma.booking.findFirst({where:{id:bookingId,userId:userIds},include:{room:{include:{hotel:{select:{name:true, city:true}}}}}});
+        if(!booking)
+          throw new ApiError(404, "not booking found")
+        return booking
+}

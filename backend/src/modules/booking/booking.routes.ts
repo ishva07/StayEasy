@@ -1,7 +1,7 @@
 import { Router } from "express";
 import validate from "../../middleware/validate.middleware";
 import { bookingSchema } from "./booking.validate";
-import { bookingController, cancelBookingController, changeBookingStatusController, checkRoomAvailabilityController, getAllBookingsController, getMyBookingsController } from "./booking.controller";
+import { bookingController, cancelBookingController, changeBookingStatusController, checkRoomAvailabilityController, getAllBookingsController, getBookingByIdController, getMyBookingsController } from "./booking.controller";
 import { authenticate } from '../../middleware/auth.middleware';
 import { hasPermission } from "../../middleware/permission.middleware";
 import { PERMISSIONS } from "../../constant/permissions";
@@ -13,6 +13,7 @@ bookingRoute.patch("/:bookingId/cancel",authenticate(),hasPermission(PERMISSIONS
 bookingRoute.put("/:bookingId/status",authenticate(),hasPermission(PERMISSIONS.CHANGE_BOOKiNG_STATUS),changeBookingStatusController);
 bookingRoute.get("/myBookings",authenticate(),hasPermission(PERMISSIONS.VIEW_MY_BOOKING),getMyBookingsController);
 bookingRoute.get("/",authenticate(),hasPermission(PERMISSIONS.VIEW_BOOKiNG),getAllBookingsController);
-bookingRoute.get("/check/available",authenticate(),checkRoomAvailabilityController)
+bookingRoute.get("/check/available",authenticate(),checkRoomAvailabilityController);
+bookingRoute.get("/:bookingId", authenticate(),hasPermission(PERMISSIONS.VIEW_MY_BOOKING), getBookingByIdController);
 
 export default bookingRoute;
