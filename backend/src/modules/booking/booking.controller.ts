@@ -6,6 +6,7 @@ import {
   changeBookingStatusService,
   checkRoomAvailabilityService,
   getAllBookingsService,
+  getBookingByIdService,
   getMyBookingsService,
 } from "./booking.service";
 import ApiResponse from "../../utils/ApiResponse";
@@ -77,3 +78,10 @@ export const checkRoomAvailabilityController = asyncHandler(async(req:Request,re
   const roomAvailable = await checkRoomAvailabilityService(data);
   res.status(200).json(new ApiResponse(true,"room Availability status.",roomAvailable));
 })
+
+export const getBookingByIdController = asyncHandler(async (req: Request, res: Response) => {
+  const  bookingId  = req.params.bookingId.toString();
+  const userId = req.user.id;
+  const booking = await getBookingByIdService(bookingId, userId);
+  res.status(200).json(new ApiResponse(true, "Booking fetched successfully.", booking));
+});
