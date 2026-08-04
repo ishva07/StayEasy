@@ -1,13 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Hotel } from "@/features/admin/hotel/types/hotel.types";
+import { Hotel } from "@/features/hotels/types/hotels.type";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Eye, BedDouble } from "lucide-react";
 
 interface GetColumnsProps {
   onEdit?: (hotel: Hotel) => void;
-  onViewRooms?:(hotel:Hotel)=>void;
+  onViewRooms?: (hotel: Hotel) => void;
   onDelete?: (hotel: Hotel) => void;
   onView: (hotel: Hotel) => void;
 }
@@ -16,7 +16,7 @@ export function getHotelColumns({
   onEdit,
   onDelete,
   onView,
-  onViewRooms
+  onViewRooms,
 }: GetColumnsProps): ColumnDef<Hotel>[] {
   return [
     {
@@ -48,57 +48,63 @@ export function getHotelColumns({
     {
       accessorKey: "city",
       header: "City",
+      cell: ({ row }) => row.original.city?.name ?? "—",
+    },
+    {
+      accessorKey: "propertyType",
+      header: "Property Type",
+      cell: ({ row }) => row.original.propertyType?.name ?? "—",
     },
     {
       accessorKey: "isFeatured",
       header: "Featured",
       cell: ({ row }) => (row.original.isFeatured ? "Yes" : "No"),
     },
-   {
-  id: "actions",
-  header: "Actions",
-  enableSorting: false,
-  cell: ({ row }) => (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onView(row.original)}
-      >
-        <Eye className="h-4 w-4" />
-      </Button>
+    {
+      id: "actions",
+      header: "Actions",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onView(row.original)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
 
-      {onViewRooms && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onViewRooms(row.original)}
-        >
-          <BedDouble className="h-4 w-4" />
-        </Button>
-      )}
+          {onViewRooms && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onViewRooms(row.original)}
+            >
+              <BedDouble className="h-4 w-4" />
+            </Button>
+          )}
 
-      {onEdit && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(row.original)}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-      )}
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
 
-      {onDelete && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(row.original)}
-        >
-          <Trash2 className="h-4 w-4 text-red-600" />
-        </Button>
-      )}
-    </div>
-  ),
-},
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(row.original)}
+            >
+              <Trash2 className="h-4 w-4 text-red-600" />
+            </Button>
+          )}
+        </div>
+      ),
+    },
   ];
 }

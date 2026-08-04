@@ -23,6 +23,7 @@ app.use(cookieParser(env.COOKIE_PARSER))
 
 app.use("/api/v1",route);
 app.use("/uploads", express.static("uploads"));
+app.use("/static", express.static("public"));   
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 

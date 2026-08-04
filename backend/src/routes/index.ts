@@ -7,6 +7,8 @@ import hotelAmenities from "../modules/hotelAmenities/hotelAmenities.route";
 import amenities from "../modules/amenities/amenities.route";
 import hotelImages from "../modules/hotelImageGallery/imagesGalleryRoutes";
 import dashboardRoute from "../modules/dashboard/dashboard.route";
+import cityRoute from "../modules/city/city.route";
+import propertyTypeRoute from "../modules/propertyType/propertyType.route";
 
 const route = Router();
 
@@ -18,5 +20,7 @@ route.use("/hotels",hotelAmenities);
 route.use("/amenities",amenities);
 route.use("/hotels",hotelImages);
 route.use("/dashboard",dashboardRoute);
+route.use("/city",cityRoute);
+route.use("/property-type",propertyTypeRoute);
 
 export default route;

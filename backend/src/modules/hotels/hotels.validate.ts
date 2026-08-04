@@ -6,7 +6,8 @@ export const createHotelSchema = z.object({
     description: z
       .string()
       .min(5, "Hotel description should be of minimum 5 characters."),
-    city: z.string(),
+    cityId: z.string(),
+    propertyTypeId: z.string(),
     address: z.string(),
     isFeatured: z.coerce.boolean().optional(),
     amenitiesIds: z.preprocess((val) => {
@@ -32,7 +33,8 @@ export const editHotelSchema = z.object({
       .string()
       .min(5, "Hotel description should be of minimum 5 characters.")
       .optional(),
-    city: z.string().optional(),
+    cityId: z.string().optional(),
+    propertyTypeId: z.string(),
     address: z.string().optional(),
     isFeatured: z.coerce.boolean().optional(),
   }),

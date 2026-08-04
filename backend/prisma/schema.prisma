@@ -62,13 +62,16 @@ model Hotel {
   id          String   @id @default(cuid())
   name        String   @unique
   description String
-  city String?
+  cityId String?
   address String?
   heroImage String?
+  propertyTypeId String?
   isFeatured Boolean @default(false)
   room        Room[]
   hotelAmenities HotelAmenities[]
   imageGallery HotelImages[]
+  city City? @relation(fields: [cityId], references: [id])
+  propertyType PropertyType? @relation(fields: [propertyTypeId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -115,6 +118,19 @@ model HotelImages{
   createdAt DateTime @default(now())
 }
 
+model City{
+  id String @id @default(cuid())
+  name String @unique
+  images String?
+  hotel Hotel[]
+}
+
+model PropertyType{
+  id String @id @default(cuid())
+  name String @unique
+  image String
+  hotel Hotel[]
+}
 model Booking{
   id String @id @default(cuid())
   checkIn DateTime 

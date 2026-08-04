@@ -7,13 +7,25 @@ export interface HotelResponse<T>{
 }
 
 export interface Hotel {
-    id: string;
+  id: string;
+  name: string;
+  description: string;
+  cityId?: string | null;
+  city?: {
     name: string;
-    description: string;
-    city: string;
-    address: string;
-    isFeatured: boolean;
-    heroImage: string;  
-    createdAt: string;
-    updatedAt: string;
+  } | null;                   
+  address?: string | null;
+  heroImage?: string | null;
+  propertyTypeId?: string | null;
+  propertyType?: {
+    name: string;
+  } | null;                    
+  isFeatured: boolean;
+  hotelAmenities?: {
+    id: string;
+    amenities: { id: string; name: string };
+  }[];
+  imageGallery?: { id: string; url: string }[];
+  createdAt?: string;
+  updatedAt?: string;
 }

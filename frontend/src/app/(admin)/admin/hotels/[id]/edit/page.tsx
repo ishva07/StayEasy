@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { HotelForm } from "@/features/admin/hotel/components/HotelForm";
 import { useHotelById } from "@/features/hotels/hooks/useHotelById";
@@ -22,6 +23,27 @@ export function EditHotelContent() {
 
   const isSubmitting = isEditingBasic || isEditingAmenities || isEditingImages;
 
+  const defaultValues = useMemo(
+    () => ({
+      name: hotel?.name ?? "",
+      description: hotel?.description ?? "",
+      cityId: hotel?.city?.id ?? "",
+      propertyTypeId: hotel?.propertyType?.id ?? "",
+      address: hotel?.address ?? "",
+      isFeatured: hotel?.isFeatured ?? false,
+      amenitiesIds: hotel?.hotelAmenities?.map((ha: any) => ha.amenitiesId) ?? [],
+    }),
+    [hotel],
+  );
+
+  const initialGalleryUrls = useMemo(
+    () =>
+      hotel?.imageGallery?.map(
+        (img: any) => `${process.env.NEXT_PUBLIC_UPLOADS_URL}${img.url}`,
+      ) ?? [],
+    [hotel?.imageGallery],
+  );
+
   const handleSubmit = (data: editHotelInputData) => {
     editHotel(
       {
@@ -29,10 +51,11 @@ export function EditHotelContent() {
         data: {
           name: data.name,
           description: data.description,
-          city: data.city,
+          cityId: data.cityId,
+          propertyTypeId: data.propertyTypeId,
           address: data.address,
           isFeatured: data.isFeatured,
-          heroImage: data.heroImage, // undefined agar user ne nahi badla — service already guard karti hai
+          heroImage: data.heroImage,
         },
       },
       {
@@ -45,32 +68,25 @@ export function EditHotelContent() {
           }
           router.push("/admin/hotels");
         },
-      }
+      },
     );
   };
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">Loading hotel...</p>;
-  if (!hotel) return <p className="text-sm text-muted-foreground">Hotel not found.</p>;
+  if (isLoading)
+    return <p className="text-sm text-muted-foreground">Loading hotel...</p>;
+  if (!hotel)
+    return <p className="text-sm text-muted-foreground">Hotel not found.</p>;
 
   return (
     <div className="max-w-2xl space-y-4">
       <h1 className="text-xl font-semibold">Edit Hotel</h1>
       <HotelForm
-        mode="edit"                                                          
-        defaultValues={{
-          name: hotel.name,
-          description: hotel.description,
-          city: hotel.city,
-          address: hotel.address,
-          isFeatured: hotel.isFeatured,
-          amenitiesIds: hotel.hotelAmenities?.map((ha: any) => ha.amenitiesId) ?? [],
-        }}
+        mode="edit"
+        defaultValues={defaultValues}
         initialHeroImageUrl={
           hotel.heroImage ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}` : null
-        } 
-        initialGalleryUrls={
-          hotel.imageGallery?.map((img: any) => `${process.env.NEXT_PUBLIC_UPLOADS_URL}${img.url}`) ?? []
-        } 
+        }
+        initialGalleryUrls={initialGalleryUrls}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel="Update Hotel"
@@ -79,10 +95,10 @@ export function EditHotelContent() {
   );
 }
 
-export default function EditHotelPage(){
-  return(
+export default function EditHotelPage() {
+  return (
     <ProtectedRoute requiredPermission={PERMISSIONS.EDIT_HOTEL}>
-    <EditHotelContent />
-  </ProtectedRoute>
-  )
+      <EditHotelContent />
+    </ProtectedRoute>
+  );
 }
