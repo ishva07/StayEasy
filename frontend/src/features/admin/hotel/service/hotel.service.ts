@@ -11,8 +11,9 @@ export const hotelService = {
 
     formData.append("name", data.name);
     formData.append("description", data.description);
-    formData.append("city", data.city);
+    formData.append("cityId", data.cityId);
     formData.append("address", data.address);
+    formData.append("propertyTypeId", data.propertyTypeId);
     if (data.isFeatured) formData.append("isFeatured", String(data.isFeatured));
     if (data.heroImage) {
       formData.append("heroImage", data.heroImage);
@@ -34,7 +35,8 @@ export const hotelService = {
     const formData = new FormData();
     if (data.name) formData.append("name", data.name);
     if (data.description) formData.append("description", data.description);
-    if (data.city) formData.append("city", data.city);
+    if (data.cityId) formData.append("cityId", data.cityId);
+    if(data.propertyTypeId)formData.append("propertyTypeId", data.propertyTypeId);
     if (data.address) formData.append("address", data.address);
     if (data.isFeatured != undefined)
       formData.append("isFeatured", String(data.isFeatured));

@@ -4,7 +4,7 @@ import { createHotelsService, deleteHotelService, editHotelsService, getHotelsBy
 import ApiResponse from "../../utils/ApiResponse";
 
 export const createHotelController = asyncHandler(async (req: Request, res: Response) => {
-  const { name, description, city, address, isFeatured, amenitiesIds } = req.body;
+  const { name, description, cityId, address, isFeatured, amenitiesIds, propertyTypeId } = req.body;
 
   const files = req.files as {
     heroImage?: Express.Multer.File[];
@@ -17,7 +17,7 @@ export const createHotelController = asyncHandler(async (req: Request, res: Resp
     : [];
 
   const newHotel = await createHotelsService({
-    name, description, city, address, isFeatured, heroImage, amenitiesIds, imageGallery,
+    name, description, cityId, address, isFeatured, heroImage, amenitiesIds, imageGallery,propertyTypeId
   });
 
   res.status(201).json(new ApiResponse(true, "hotel created successfully", newHotel));
@@ -25,10 +25,10 @@ export const createHotelController = asyncHandler(async (req: Request, res: Resp
 
 export const editHotelController = asyncHandler(async(req:Request,res:Response)=>{
     const id = req.params.id.toString();
-    const {name,description,city,address,isFeatured} = req.body;
+    const {name,description,cityId,address,isFeatured, propertyTypeId} = req.body;
     const heroImage = req.file? `/uploads/${req.file.filename}` : undefined;
 
-    const updatedHotel = await editHotelsService(id,{name,description,city,address,isFeatured,heroImage})
+    const updatedHotel = await editHotelsService(id,{name,description,cityId,address,isFeatured,heroImage,propertyTypeId})
     res.status(200).json(new ApiResponse(true,"hotel updated successfully",updatedHotel));
 })
 

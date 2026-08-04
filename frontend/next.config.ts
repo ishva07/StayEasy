@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  reactCompiler: false,
   images: {
     unoptimized: process.env.NODE_ENV === "development",
     remotePatterns: [
@@ -15,3 +16,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

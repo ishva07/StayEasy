@@ -57,8 +57,13 @@ function HotelDetailContent() {
           {hotel.isFeatured && <Badge>Featured</Badge>}
         </div>
         <p className="text-muted-foreground">
-          {hotel.city} — {hotel.address}
-        </p>
+  {hotel.city?.name ?? "No city"} — {hotel.address}
+</p>
+<div className="flex items-center gap-2 flex-wrap">
+  <h1 className="text-2xl font-semibold">{hotel.name}</h1>
+  {hotel.isFeatured && <Badge>Featured</Badge>}
+  {hotel.propertyType?.name && <Badge variant="outline">{hotel.propertyType.name}</Badge>}
+</div>
         <p className="text-sm">{hotel.description}</p>
       </div>
 

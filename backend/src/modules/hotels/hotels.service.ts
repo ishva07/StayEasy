@@ -66,7 +66,9 @@ export const getHotelsByIdService = async(id:string)=>{
     include:{
         room:true,
         hotelAmenities:{include:{amenities:true}},
-        imageGallery:true
+        imageGallery:true,
+        city:true,
+        propertyType:true
     }});
     return hotelsById;
 }
@@ -126,6 +128,8 @@ export const getHotelService = async ({
       orderBy: { [sortByFilter]: orderFilter },
       include: {
         hotelAmenities: { include: { amenities: true } }, 
+        city:{select:{name:true}},
+        propertyType:{select:{name:true}}
       },
     }),
     prisma.hotel.count({ where }),

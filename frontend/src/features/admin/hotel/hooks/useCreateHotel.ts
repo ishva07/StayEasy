@@ -1,4 +1,4 @@
-import { useMutation, QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createHotelInputData } from "../validation/hotel.validation";
 import { hotelService } from "../service/hotel.service";
 import { toast } from "sonner";

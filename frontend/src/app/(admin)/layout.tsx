@@ -10,6 +10,8 @@ import {
   CalendarCheck,
   Hotel,
   LayoutDashboard,
+  MapPin,
+  Tag,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -52,18 +54,28 @@ export default function AdminLayout({
         navItems={[
           {
             label: "Dashboard",
-            href: "/dashboard",
+            href: "/admin/dashboard",
             icon: LayoutDashboard,
           },
           {
             label: "Hotels",
-            href: "/hotels",
+            href: "/admin/hotels",
             icon: Building2,
           },
           {
             label: "Bookings",
-            href: "/bookings",
+            href: "/admin/bookings",
             icon: CalendarCheck,
+          },
+          {
+            label: "Cities",
+            href: "/admin/cities",
+            icon: MapPin,
+          },
+          {
+            label: "Property Types",
+            href: "/admin/property-types",
+            icon: Tag,
           },
         ]}
       >

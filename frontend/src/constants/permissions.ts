@@ -16,7 +16,15 @@ export const PERMISSIONS={
     VIEW_AMENITIES:"view_amenities",
     EDIT_AMENITIES:"edit_amenities",
     VIEW_IMAGE_GALLERY:"view_image_gallery",
-    EDIT_IMAGE_GALLERY:"edit_image_gallery"
+    EDIT_IMAGE_GALLERY:"edit_image_gallery",
+    ADD_CITY: "add_city",
+    EDIT_CITY: "edit_city",
+    DELETE_CITY: "delete_city",
+    VIEW_CITY: "view_city",
+    VIEW_PROPERTY_TYPE:"view_property_type",
+    ADD_PROPERTY_TYPE :"add_property_type",
+    EDIT_PROPERTY_TYPE :"edit_property_type",
+    DELETE_PROPERTY_TYPE:"delete_property_type"
 }as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

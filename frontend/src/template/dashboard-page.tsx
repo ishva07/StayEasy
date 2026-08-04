@@ -68,7 +68,6 @@ export function DashboardLayout({
           ))}
         </nav>
 
-        {/* 👇 User section with 3-dot dropdown */}
         {user && (
           <div className="border-t p-3">
             <DropdownMenu>
