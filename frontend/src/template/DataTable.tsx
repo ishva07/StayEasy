@@ -80,7 +80,10 @@ export function DataTable<TData, TValue>({
                   const sortDir = header.column.getIsSorted();
 
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className="bg-slate-50 text-left text-sm font-semibold text-slate-900"
+                    >
                       {header.isPlaceholder ? null : canSort ? (
                         <button
                           type="button"

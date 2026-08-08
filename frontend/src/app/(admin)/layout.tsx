@@ -77,6 +77,11 @@ export default function AdminLayout({
             href: "/admin/property-types",
             icon: Tag,
           },
+          {
+            label: "Amenities",
+            href: "/admin/amenities",
+            icon: BedDouble,
+          },
         ]}
       >
         {children}
