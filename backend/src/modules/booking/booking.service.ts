@@ -122,7 +122,7 @@ export const getMyBookingsService = async (
       orderBy: {
         [sortByFilter]: orderByFilter,
       },
-      include: { room: { include: { hotel: { select: { name: true } } } } },
+      include: { room: { include: { hotel: { select: { name: true , city:true} } } } },
     }),
     prisma.booking.count({ where: { userId } }),
   ]);
