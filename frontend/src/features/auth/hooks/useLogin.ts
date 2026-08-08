@@ -11,10 +11,9 @@ export function useLogin() {
   const mutation = useMutation({
     mutationFn: (data: loginInput) => authService.loginApi(data),
 
-      onSuccess: (user) => {
-      queryClient.removeQueries({ queryKey: ["me"] });   
+    onSuccess: (user) => {
+      queryClient.removeQueries({ queryKey: ["me"] });
       setUser(user);
-      queryClient.setQueryData(["me"], user);       
     },
 
     onError: (error: any) => {
