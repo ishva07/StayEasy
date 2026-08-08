@@ -62,7 +62,11 @@ export function getBookingColumns({ onStatusChange, isUpdating, canChangeStatus 
                         <div className="h-10 w-10 overflow-hidden rounded-md bg-muted">
                             <img src={`${process.env.NEXT_PUBLIC_UPLOADS_URL}${row.original.room.roomImage}`} alt={row.original.room?.name ?? "room"} className="h-full w-full object-cover" />
                         </div>
-                    ) : null}
+                    ) : (
+                        <div className="h-10 w-10 rounded-md bg-slate-100 flex items-center justify-center text-sm font-medium text-slate-700">
+                            {String(row.original.room?.name ?? "").slice(0,2).toUpperCase()}
+                        </div>
+                    )}
                     <div>
                         <p className="font-medium">{row.original.room?.name ?? "—"}</p>
                         <p className="text-xs text-muted-foreground">{row.original.room?.hotel?.name ?? "—"}</p>
