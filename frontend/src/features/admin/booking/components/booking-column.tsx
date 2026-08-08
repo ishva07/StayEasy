@@ -24,6 +24,7 @@ export interface Booking {
         hotel?: {
             name: string;
         };
+        roomImage?: string;
     };
 }
 
@@ -56,9 +57,16 @@ export function getBookingColumns({ onStatusChange, isUpdating, canChangeStatus 
             header: "Room / Hotel",
             enableSorting: false,
             cell: ({ row }) => (
-                <div>
-                    <p className="font-medium">{row.original.room?.name ?? "—"}</p>
-                    <p className="text-xs text-muted-foreground">{row.original.room?.hotel?.name ?? "—"}</p>
+                <div className="flex items-center gap-3">
+                    {row.original.room?.roomImage ? (
+                        <div className="h-10 w-10 overflow-hidden rounded-md bg-muted">
+                            <img src={`${process.env.NEXT_PUBLIC_UPLOADS_URL}${row.original.room.roomImage}`} alt={row.original.room?.name ?? "room"} className="h-full w-full object-cover" />
+                        </div>
+                    ) : null}
+                    <div>
+                        <p className="font-medium">{row.original.room?.name ?? "—"}</p>
+                        <p className="text-xs text-muted-foreground">{row.original.room?.hotel?.name ?? "—"}</p>
+                    </div>
                 </div>
             ),
         },

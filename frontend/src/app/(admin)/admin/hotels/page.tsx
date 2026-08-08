@@ -60,24 +60,31 @@ export function HotelsContent() {
     };
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Hotels</h1>
-                {hasPermission(PERMISSIONS.ADD_HOTEL) &&(
-                    <Button onClick={() => router.push("/admin/hotels/new")}>Add Hotel</Button>
-                )}
-            </div>
+        <div className="space-y-6">
+            <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Hotels</h1>
+                        <p className="mt-2 text-sm text-slate-500">Manage your hotel inventory, view details, and update listings.</p>
+                    </div>
+                    {hasPermission(PERMISSIONS.ADD_HOTEL) && (
+                        <Button onClick={() => router.push("/admin/hotels/new")}>Add Hotel</Button>
+                    )}
+                </div>
+            </section>
 
-            <DataTable
-                columns={columns}
-                data={data?.data ?? []}
-                pageCount={data?.totalPage ?? 0}
-                pagination={pagination}
-                onPaginationChange={setPagination}
-                sorting={sorting}
-                onSortingChange={setSorting}
-                isLoading={isLoading}
-            />
+            <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
+                <DataTable
+                    columns={columns}
+                    data={data?.data ?? []}
+                    pageCount={data?.totalPage ?? 0}
+                    pagination={pagination}
+                    onPaginationChange={setPagination}
+                    sorting={sorting}
+                    onSortingChange={setSorting}
+                    isLoading={isLoading}
+                />
+            </section>
 
            {canDelete && 
             (<ConfirmDialog

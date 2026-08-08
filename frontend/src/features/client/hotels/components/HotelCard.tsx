@@ -8,7 +8,7 @@ interface HotelCardProps {
   hotel: {
     id: string;
     name: string;
-    city?: string | null;
+    city?: { id: string; name: string; images?: string } | null;
     heroImage?: string | null;
     isFeatured?: boolean;
   };
@@ -64,7 +64,7 @@ export function HotelCard({ hotel }: HotelCardProps) {
 
         {hotel.city && (
           <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <MapPin className="h-3 w-3" /> {hotel.city}
+            <MapPin className="h-3 w-3" /> {hotel.city.name}
           </p>
         )}
       </div>

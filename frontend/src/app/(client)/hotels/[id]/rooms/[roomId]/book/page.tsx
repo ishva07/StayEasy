@@ -6,7 +6,7 @@ import { useGetRoomById } from "@/features/rooms/hooks/useGetRoomById";
 import { useCreateBooking } from "@/features/client/booking/hooks/useCreateBookings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Users, IndianRupee } from "lucide-react";
+import { ArrowLeft, Users, IndianRupee, CalendarDays } from "lucide-react";
 
 export default function BookRoomPage() {
   const router = useRouter();
@@ -15,13 +15,22 @@ export default function BookRoomPage() {
   const { data: room, isLoading } = useGetRoomById(hotelId, roomId);   
   const { createBooking, isPending } = useCreateBooking();
 
-
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [error, setError] = useState("");
 
-  if (isLoading) return <p className="p-6 text-sm text-muted-foreground">Loading...</p>;
-  if (!room) return <p className="p-6 text-sm text-muted-foreground">Room not found.</p>;
+  if (isLoading)
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <p className="text-sm text-muted-foreground">Loading room details...</p>
+      </div>
+    );
+  if (!room)
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <p className="text-sm text-muted-foreground">Room not found.</p>
+      </div>
+    );
 
   const dayCount =
     checkIn && checkOut
@@ -56,67 +65,113 @@ export default function BookRoomPage() {
     : "";
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => router.push(`/hotels/${hotelId}`)}>
-        <ArrowLeft className="h-4 w-4 mr-1" /> Back to hotel
-      </Button>
+    <div className="min-h-screen bg-background px-4 py-10 sm:px-6 sm:py-12">
+      <div className="mx-auto max-w-3xl space-y-8">
+        {/* Back link */}
+        <button
+          onClick={() => router.push(`/hotels/${hotelId}`)}
+          className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-3.5 py-2 text-sm font-medium text-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-accent/70 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+        >
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+          <span>Back to hotel</span>
+        </button>
 
-      <div className="flex gap-4 border border-border rounded-lg p-4">
-        <div className="h-20 w-28 rounded-md overflow-hidden bg-muted flex-shrink-0">
-          {roomImageUrl ? (
-            <img src={roomImageUrl} alt={room.name} className="h-full w-full object-cover" />
-          ) : null}
+        <div className="overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-[0_20px_80px_rgba(15,23,42,0.06)]">
+          <div className="grid gap-8 p-6 sm:p-8">
+            <div className="grid gap-6 md:grid-cols-[170px_minmax(0,1fr)] items-center">
+              <div className="h-40 w-full overflow-hidden rounded-3xl bg-muted ring-1 ring-border/50">
+                {roomImageUrl ? (
+                  <img src={roomImageUrl} alt={room.name} className="h-full w-full object-cover" />
+                ) : null}
+              </div>
+                <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    {roomImageUrl ? (
+                      <div className="h-10 w-10 overflow-hidden rounded-md bg-muted">
+                        <img src={roomImageUrl} alt={room.name} className="h-full w-full object-cover" />
+                      </div>
+                    ) : null}
+                    <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+                      {room.name}
+                    </h1>
+                  </div>
+                  <p className="text-sm italic text-muted-foreground">{room.hotel?.name}</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-3 py-1.5 text-sm font-medium text-secondary">
+                    <Users className="h-4 w-4" />
+                    Up to {room.capacity} guests
+                  </span>
+                  <span className="text-base font-semibold text-foreground">
+                    <IndianRupee className="mr-1 inline-block h-4 w-4 align-text-top" />
+                    {Number(room.price).toLocaleString()} <span className="text-sm font-medium text-muted-foreground">/ night</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[1.75rem] border border-border/60 bg-background p-6 sm:p-7">
+              <div className="flex items-center gap-3 text-lg font-semibold text-foreground">
+                <CalendarDays className="h-5 w-5 text-secondary" />
+                Reservation dates
+              </div>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                    Check-in
+                  </label>
+                  <Input
+                    type="date"
+                    value={checkIn}
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="rounded-full h-12 px-4 focus-visible:ring-primary/40 focus-visible:border-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                    Check-out
+                  </label>
+                  <Input
+                    type="date"
+                    value={checkOut}
+                    min={checkIn || new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="rounded-full h-12 px-4 focus-visible:ring-primary/40 focus-visible:border-primary"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <p className="mt-4 rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+                  {error}
+                </p>
+              )}
+
+              {dayCount > 0 && (
+                <div className="mt-6 flex flex-col gap-3 border-t border-border/60 pt-5 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                  <span>
+                    {dayCount} night{dayCount > 1 ? "s" : ""} × ₹{Number(room.price).toLocaleString()}
+                  </span>
+                  <span className="font-display text-2xl font-semibold text-foreground">
+                    ₹{estimatedTotal.toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <div>
-          <h2 className="font-semibold">{room.name}</h2>
-          <p className="text-xs text-muted-foreground">{room.hotel?.name}</p>
-          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-            <Users className="h-3 w-3" /> Up to {room.capacity} guests
-          </p>
-          <p className="text-sm font-medium flex items-center gap-1 mt-1">
-            <IndianRupee className="h-3 w-3" /> {Number(room.price).toLocaleString()} / night
-          </p>
-        </div>
+
+        <Button
+          className="w-full rounded-full h-12 text-sm font-medium bg-primary text-primary-foreground shadow-[0_10px_40px_rgba(14,165,233,0.16)] transition-shadow hover:shadow-[0_12px_45px_rgba(14,165,233,0.22)]"
+          onClick={handleSubmit}
+          disabled={isPending}
+        >
+          {isPending ? "Booking..." : "Confirm Booking"}
+        </Button>
       </div>
-
-      <div className="space-y-4 border border-border rounded-lg p-4">
-        <h3 className="font-medium text-sm">Select your dates</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs text-muted-foreground">Check-in</label>
-            <Input
-              type="date"
-              value={checkIn}
-              min={new Date().toISOString().split("T")[0]}
-              onChange={(e) => setCheckIn(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Check-out</label>
-            <Input
-              type="date"
-              value={checkOut}
-              min={checkIn || new Date().toISOString().split("T")[0]}
-              onChange={(e) => setCheckOut(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {error && <p className="text-xs text-destructive">{error}</p>}
-
-        {dayCount > 0 && (
-          <div className="flex justify-between items-center pt-2 border-t border-border text-sm">
-            <span className="text-muted-foreground">
-              {dayCount} night{dayCount > 1 ? "s" : ""} × ₹{Number(room.price).toLocaleString()}
-            </span>
-            <span className="font-semibold">₹{estimatedTotal.toLocaleString()}</span>
-          </div>
-        )}
-      </div>
-
-      <Button className="w-full" onClick={handleSubmit} disabled={isPending}>
-        {isPending ? "Booking..." : "Confirm Booking"}
-      </Button>
     </div>
   );
 }

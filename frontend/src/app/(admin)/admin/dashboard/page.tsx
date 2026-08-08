@@ -48,23 +48,24 @@ export function DashboardContent() {
   ];
 
   return (
-    <div className="h-full flex flex-col gap-4 p-4 overflow-hidden">
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
+    <div className="h-full flex flex-col gap-6 p-4 overflow-hidden">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
-          <div key={card.label} className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3">
-            <p className="text-xs text-gray-500">{card.label}</p>
-            <p className="text-xl font-semibold text-gray-900 mt-1">
+          <div key={card.label} className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 px-5 py-5 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{card.label}</p>
+            <p className="mt-3 text-3xl font-semibold text-slate-950">
               {isLoading ? "—" : card.value}
             </p>
           </div>
         ))}
-      </div>
+      </section>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-shrink-0" style={{ height: "230px" }}>
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-col">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Monthly Bookings</h3>
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ minHeight: 260 }}>
+        <div className="lg:col-span-2 rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-5 shadow-sm flex flex-col">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900">Monthly Bookings</h3>
+            <span className="text-xs text-slate-500">Last 12 months</span>
+          </div>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={monthlyBookings} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
@@ -90,8 +91,11 @@ export function DashboardContent() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-col">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Booking Status</h3>
+        <div className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-5 shadow-sm flex flex-col">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900">Booking Status</h3>
+            <span className="text-xs text-slate-500">Current</span>
+          </div>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -112,27 +116,34 @@ export function DashboardContent() {
                   verticalAlign="middle"
                   align="right"
                   iconType="circle"
-                  formatter={(value) => <span className="text-xs text-gray-600">{value}</span>}
+                  formatter={(value) =>
+                    typeof value === "object"
+                      ? (value as any).name ?? String(value)
+                      : String(value)
+                  }
                 />
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Tables row - takes remaining space */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-4 overflow-y-auto">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Recent Bookings</h3>
+        <div className="lg:col-span-2 rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-5 overflow-y-auto shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900">Recent Bookings</h3>
+            <span className="text-xs text-slate-500">Most recent entries</span>
+          </div>
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b border-gray-100">
-                <th className="py-2 font-medium text-xs">Hotel</th>
-                <th className="py-2 font-medium text-xs">Room</th>
-                <th className="py-2 font-medium text-xs">Check In</th>
-                <th className="py-2 font-medium text-xs">Check Out</th>
-                <th className="py-2 font-medium text-xs">Status</th>
+              <tr className="text-left text-slate-500 border-b border-slate-200">
+                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Hotel</th>
+                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Room</th>
+                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Check In</th>
+                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Check Out</th>
+                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -157,24 +168,31 @@ export function DashboardContent() {
           </table>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 overflow-y-auto">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Recent Hotels</h3>
+        <div className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-5 overflow-y-auto shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900">Recent Hotels</h3>
+            <span className="text-xs text-slate-500">Latest additions</span>
+          </div>
           <div className="space-y-3">
             {recentHotels.map((hotel: any) => {
               const imageUrl = hotel.heroImage
                 ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}`
                 : "";
+              const hotelCity =
+                hotel.city && typeof hotel.city === "object"
+                  ? hotel.city.name
+                  : hotel.city;
 
               return (
                 <div key={hotel.id} className="flex items-center gap-3">
-                  <div className="relative h-11 w-11 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                  <div className="relative h-11 w-11 rounded-lg overflow-hidden bg-muted shrink-0">
                     {imageUrl ? (
                       <img src={imageUrl} alt={hotel.name} className="h-full w-full object-cover" />
                     ) : null}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-gray-900 truncate">{hotel.name}</p>
-                    <p className="text-[11px] text-gray-500">{hotel.city ?? "-"}</p>
+                    <p className="text-[11px] text-gray-500">{hotelCity ?? "-"}</p>
                   </div>
                 </div>
               );
