@@ -24,7 +24,7 @@ import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { PERMISSIONS } from "@/constants/permissions";
 import { usePermission } from "@/hooks/usePermission";
 
-import { getCity } from "@/features/admin/city/hook/useGetCity";
+import { getCity } from "@/features/city/hooks/useGetCity";
 import { useCreateCity } from "@/features/admin/city/hook/useCreateCity";
 import { useEditCity } from "@/features/admin/city/hook/useEditCity";
 import { useDeleteCity } from "@/features/admin/city/hook/useDeleteCity";
