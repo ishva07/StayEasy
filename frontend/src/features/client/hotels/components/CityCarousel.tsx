@@ -81,7 +81,7 @@ export function CityCarousel({ cities }: { cities: City[] }) {
         {cities.map((city) => (
           <Link
             key={city.id}
-            href={`/?search=${encodeURIComponent(city.name)}`}
+           href={`/search?city=${city.id}`}  
             className="min-w-[160px] sm:min-w-[180px] snap-start group"
           >
             <div className="relative h-40 sm:h-48 w-full rounded-xl overflow-hidden">

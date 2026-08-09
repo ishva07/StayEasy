@@ -2,7 +2,7 @@ import api from "@/services/api";
 import { Hotel, HotelResponse } from "../types/hotels.type";
 
 export const hotelService = {
-  getHotelService: async ({
+getHotelService: async ({
     page = 1,
     limit = 10,
     sortBy = "createdAt",
@@ -10,6 +10,8 @@ export const hotelService = {
     search = "",
     featured,
     amenityIds,
+    city,
+    propertyType,
   }: {
     page?: number;
     limit?: number;
@@ -18,6 +20,8 @@ export const hotelService = {
     search?: string;
     featured?: boolean;
     amenityIds?: string[];
+    city?: string;
+    propertyType?: string;
   }): Promise<HotelResponse<Hotel>> => {
     const response = await api.get("/hotels", {
       params: {
@@ -25,9 +29,11 @@ export const hotelService = {
         limit,
         sortBy,
         order,
-        search: search || undefined, 
-        featured: featured ? "true" : undefined, 
-        amenityIds: amenityIds?.length ? amenityIds.join(",") : undefined, 
+        search: search || undefined,
+        featured: featured ? "true" : undefined,
+        amenityIds: amenityIds?.length ? amenityIds.join(",") : undefined,
+        city: city || undefined,
+        propertyType: propertyType || undefined,
       },
     });
     return response.data.data;

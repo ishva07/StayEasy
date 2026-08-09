@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { hotelService } from "../../admin/hotel/service/hotel.service";
+import { hotelService } from "../../hotels/services/hotel.service";
 
 interface UseHotelsParams {
   page?: number;
@@ -9,6 +9,8 @@ interface UseHotelsParams {
   search?: string;
   featured?: boolean;
   amenityIds?: string[];
+  city?: string;
+  propertyType?: string;
 }
 
 export function useHotels({
@@ -19,10 +21,12 @@ export function useHotels({
   search = "",
   featured,
   amenityIds,
+  city,
+  propertyType,
 }: UseHotelsParams = {}) {
   return useQuery({
-    queryKey: ["hotels", { page, limit, sortBy, order, search, featured, amenityIds }],
+    queryKey: ["hotels", { page, limit, sortBy, order, search, featured, amenityIds, city, propertyType }],
     queryFn: () =>
-      hotelService.getHotelService({ page, limit, sortBy, order, search, featured, amenityIds }),
+      hotelService.getHotelService({ page, limit, sortBy, order, search, featured, amenityIds, city, propertyType }),
   });
 }

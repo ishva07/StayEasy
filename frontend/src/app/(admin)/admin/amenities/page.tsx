@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/template/DataTable";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { PERMISSIONS } from "@/constants/permissions";
-import { useGetAmenities } from "@/features/admin/amenities/hooks/useGetAmenities";
+import { useGetAmenities } from "@/features/admin/amenities/hook/useGetAmenities";
 import { getAmenityColumns } from "@/features/admin/amenities/components/amenity-column";
 
 function AmenitiesContent() {
