@@ -24,7 +24,7 @@ import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { PERMISSIONS } from "@/constants/permissions";
 import { usePermission } from "@/hooks/usePermission";
 
-import { useGetPropertyType } from "@/features/admin/propertyTypes/hooks/usePropertyTypeOptions";
+import { useGetPropertyType } from "@/features/propertyType/hooks/usePropertyTypeOptions";
 import { useCreatePropertyType } from "@/features/admin/propertyTypes/hooks/useCreatePropertyType";
 import { useEditPropertyType } from "@/features/admin/propertyTypes/hooks/useEditPropertyType";
 import { useDeletePropertyType } from "@/features/admin/propertyTypes/hooks/useDeletePropertyType";

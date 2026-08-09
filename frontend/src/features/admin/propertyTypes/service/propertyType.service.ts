@@ -19,8 +19,4 @@ export const propertyTypeService = {
     const res = await api.delete(`/property-type/${propertyTypeId}`);
     return res.data.data;
   },
-  getPropertyTypeApi: async () => {
-    const res = await api.get("/property-type");
-    return res.data.data;
-  },
 };
