@@ -80,7 +80,9 @@ export const getHotelService = async ({
   order = "desc",
   search = "",
   featured,
-  amenityIds, 
+  amenityIds,
+  city,
+  propertyType,
 }: {
   page?: number;
   limit?: number;
@@ -89,6 +91,8 @@ export const getHotelService = async ({
   search?: string;
   featured?: string;
   amenityIds?: string;
+  city?: string;
+  propertyType?: string;
 }) => {
   const skip = (page - 1) * limit;
 
@@ -97,7 +101,7 @@ export const getHotelService = async ({
   if (search) {
     where.OR = [
       { name: { contains: search, mode: "insensitive" } },
-      { city: { contains: search, mode: "insensitive" } },
+      { city: { name: { contains: search, mode: "insensitive" } } },
     ];
   }
 
@@ -106,12 +110,20 @@ export const getHotelService = async ({
   }
 
   if (amenityIds) {
-    const idsArray = amenityIds.split(",");   
+    const idsArray = amenityIds.split(",");
     where.hotelAmenities = {
       some: {
         amenitiesId: { in: idsArray },
       },
     };
+  }
+
+  if (city) {
+    where.cityId = city;
+  }
+
+  if (propertyType) {
+    where.propertyTypeId = propertyType;
   }
 
   const allowedSortBy = ["name", "createdAt", "city"];
@@ -127,9 +139,9 @@ export const getHotelService = async ({
       where,
       orderBy: { [sortByFilter]: orderFilter },
       include: {
-        hotelAmenities: { include: { amenities: true } }, 
-        city:{select:{name:true}},
-        propertyType:{select:{name:true}}
+        hotelAmenities: { include: { amenities: true } },
+        city: { select: { name: true } },
+        propertyType: { select: { name: true } },
       },
     }),
     prisma.hotel.count({ where }),

@@ -83,7 +83,7 @@ export function PropertyTypeCarousel({ types }: { types: PropertyType[] }) {
         {types.map((type) => (
           <Link
             key={type.id}
-            href={`/?propertyType=${encodeURIComponent(type.name)}`}
+            href={`/search?propertyType=${type.id}`}
             className="min-w-[120px] sm:min-w-[140px] snap-start flex flex-col items-center gap-2 group"
           >
             <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border border-border flex items-center justify-center overflow-hidden transition-colors group-hover:border-primary">
