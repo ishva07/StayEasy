@@ -28,6 +28,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         navItems={[
           { label: "Home", href: "/" },
           { label: "My Bookings", href: "/my-bookings" },
+          { label: "My Reviews", href: "/reviews" },
         ]}
       >
         {children}

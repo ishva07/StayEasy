@@ -3,21 +3,23 @@
 import { useParams, useRouter } from "next/navigation";
 import { useHotelById } from "@/features/hotels/hooks/useHotelById";
 import { Button } from "@/components/ui/button";
+import { RatingStars } from "@/features/client/reviews/components/RatingStars";
+import { ReviewList } from "@/features/client/reviews/components/ReviewList";
+import { ReviewForm } from "@/features/client/reviews/components/ReviewForm";
 import {
   ArrowLeft,
   MapPin,
   Users,
   IndianRupee,
-  Star,
   Wifi,
   Waves,
   ParkingCircle,
   UtensilsCrossed,
   Sparkles,
 } from "lucide-react";
+import { useState } from "react";
+import { ReviewsModal } from "@/features/client/reviews/components/ReviewsModal";
 
-// Small icon lookup so amenity pills can show a relevant icon when we
-// recognize the name. Falls back to a generic sparkle icon otherwise.
 const AMENITY_ICONS: Record<string, any> = {
   wifi: Wifi,
   "free wifi": Wifi,
@@ -38,19 +40,27 @@ export default function HotelDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { data: hotel, isLoading } = useHotelById(id);
 
+  const [showReviewsModal, setShowReviewsModal] = useState(false);
+
+  const UPLOADS_URL = process.env.NEXT_PUBLIC_UPLOADS_URL ?? "";
+
+  function getImageUrl(path?: string | null) {
+    if (!path) return "";
+    return `${UPLOADS_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  }
   if (isLoading) {
     return <p className="p-6 text-sm text-muted-foreground">Loading...</p>;
   }
 
   if (!hotel) {
-    return <p className="p-6 text-sm text-muted-foreground">Hotel not found.</p>;
+    return (
+      <p className="p-6 text-sm text-muted-foreground">Hotel not found.</p>
+    );
   }
 
-  const heroUrl = hotel.heroImage
-    ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}`
-    : "";
-
-  const rating = Number(hotel.rating ?? 0);
+  const heroUrl = getImageUrl(hotel.heroImage);
+  const avgRating = Number(hotel.avgRating ?? 0);
+  const reviewCount = Number(hotel.reviewCount ?? 0);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
@@ -65,7 +75,11 @@ export default function HotelDetailsPage() {
       {/* Hero */}
       <div className="relative h-72 md:h-80 w-full rounded-2xl overflow-hidden bg-muted">
         {heroUrl ? (
-          <img src={heroUrl} alt={hotel.name} className="h-full w-full object-cover" />
+          <img
+            src={heroUrl}
+            alt={hotel.name}
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-muted-foreground">
             No image
@@ -81,27 +95,21 @@ export default function HotelDetailsPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-10 lg:justify-start">
-        {/* Left column: info, amenities, gallery */}
+        {/* Left column: info, amenities, gallery, reviews */}
         <div className="space-y-6 min-w-0 w-full lg:flex-1">
           <div className="space-y-2">
             <div className="flex flex-wrap items-baseline gap-3">
               <h1 className="font-display text-3xl font-semibold tracking-tight">
                 {hotel.name}
               </h1>
-              {rating > 0 && (
-                <span className="flex items-center gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-4 w-4 ${
-                        i < Math.round(rating)
-                          ? "fill-secondary text-secondary"
-                          : "text-muted-foreground/30"
-                      }`}
-                    />
-                  ))}
+              <div className="flex items-center gap-1.5">
+                <RatingStars rating={avgRating} size={16} />
+                <span className="text-xs text-muted-foreground">
+                  {reviewCount > 0
+                    ? `${avgRating.toFixed(1)} (${reviewCount})`
+                    : "No reviews yet"}
                 </span>
-              )}
+              </div>
             </div>
 
             {hotel.city && (
@@ -118,7 +126,7 @@ export default function HotelDetailsPage() {
 
           {hotel.hotelAmenities?.length > 0 && (
             <div className="space-y-2.5">
-              <p className="text-[11px] font-bold tracking-[0.15em] uppercase  text-secondary-foreground">
+              <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-secondary-foreground">
                 Amenities
               </p>
               <div className="flex flex-wrap gap-2">
@@ -147,7 +155,7 @@ export default function HotelDetailsPage() {
                     className="aspect-square rounded-xl overflow-hidden bg-muted"
                   >
                     <img
-                      src={`${process.env.NEXT_PUBLIC_UPLOADS_URL}${img.url}`}
+                      src={getImageUrl(img.url)}
                       alt=""
                       className="h-full w-full object-cover"
                     />
@@ -156,7 +164,54 @@ export default function HotelDetailsPage() {
               </div>
             </div>
           )}
-        </div>
+
+          {/* Reviews */}
+       {/* Reviews */}
+<div className="space-y-6 pt-4 border-t border-border/60">
+  <div className="flex items-center justify-between">
+    <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-secondary-foreground">
+      Guest Reviews
+    </p>
+  </div>
+
+  {reviewCount > 0 ? (
+    <div className="flex items-center gap-5 rounded-2xl border border-border/60 bg-card p-5">
+      <div className="flex flex-col items-center justify-center rounded-xl bg-primary/10 px-5 py-3 flex-shrink-0">
+        <p className="font-display text-3xl font-bold text-primary leading-none">
+          {avgRating.toFixed(1)}
+        </p>
+        <RatingStars rating={avgRating} size={13} />
+      </div>
+      <div>
+        <p className="font-medium text-sm">
+          {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Based on verified stays at {hotel.name}
+        </p>
+      </div>
+    </div>
+  ) : (
+    <div className="rounded-2xl border border-dashed border-border/70 p-6 text-center">
+      <p className="text-sm font-medium">No reviews yet</p>
+      <p className="text-xs text-muted-foreground mt-1">
+        Be the first to share your experience at this stay.
+      </p>
+    </div>
+  )}
+
+  <ReviewList hotelId={hotel.id} limit={3} />
+
+  {reviewCount > 3 && (
+    <button
+      onClick={() => setShowReviewsModal(true)}
+      className="text-sm font-medium text-primary underline underline-offset-2"
+    >
+      See all {reviewCount} reviews
+    </button>
+  )}
+</div>
+</div>
 
         {/* Right column: available rooms */}
         <div className="space-y-4 w-full lg:w-[380px] lg:flex-shrink-0 lg:border-l lg:border-border/60 lg:pl-8">
@@ -164,15 +219,15 @@ export default function HotelDetailsPage() {
             <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-secondary-foreground">
               Choose your stay
             </p>
-            <h2 className="font-display text-xl font-semibold">Available rooms</h2>
+            <h2 className="font-display text-xl font-semibold">
+              Available rooms
+            </h2>
           </div>
 
           <div className="space-y-3">
             {hotel.room?.length > 0 ? (
               hotel.room.map((room: any) => {
-                const roomImageUrl = room.roomImage
-                  ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${room.roomImage}`
-                  : "";
+                const roomImageUrl = getImageUrl(room.roomImage);
 
                 return (
                   <div
@@ -190,7 +245,9 @@ export default function HotelDetailsPage() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium leading-tight truncate">{room.name}</p>
+                      <p className="font-medium leading-tight truncate">
+                        {room.name}
+                      </p>
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                         <Users className="h-3 w-3" /> {room.capacity}
                       </p>
@@ -220,6 +277,10 @@ export default function HotelDetailsPage() {
           </div>
         </div>
       </div>
+      
+{showReviewsModal && (
+  <ReviewsModal hotelId={hotel.id} hotelName={hotel.name} onClose={() => setShowReviewsModal(false)} />
+)}
     </div>
   );
 }

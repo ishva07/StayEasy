@@ -44,7 +44,7 @@ export default function BookingSuccessPage() {
               </h1>
               {booking.room?.hotel?.city && (
                 <p className="text-sm text-primary-foreground/80 flex items-center gap-1 mt-1">
-                  <MapPin className="h-3.5 w-3.5" /> {booking.room.hotel.city}
+                  <MapPin className="h-3.5 w-3.5" /> {booking.room.hotel.city.name}
                 </p>
               )}
             </div>
