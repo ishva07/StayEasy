@@ -139,6 +139,7 @@ export const getHotelService = async ({
       where,
       orderBy: { [sortByFilter]: orderFilter },
       include: {
+        room:true,
         hotelAmenities: { include: { amenities: true } },
         city: { select: { name: true } },
         propertyType: { select: { name: true } },

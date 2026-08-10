@@ -22,4 +22,10 @@ export const PERMISSIONS={
     DELETE_CITY:"delete_city",
     VIEW_CITY:"view_city",
     VIEW_PROPERTY_TYPE:"view_property_type",
+    ADD_REVIEW:"add_review",
+    EDIT_REVIEW:"edit_review",
+    DELETE_REVIEW:"delete_review",
+    VIEW_MY_REVIEW:"view_my_review",
+    EDIT_REVIEW_STATUS:"edit_review_status",
+    VIEW_ALL_REVIEW:"view_all_review"
 }as const;

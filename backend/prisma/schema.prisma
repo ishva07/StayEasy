@@ -24,6 +24,7 @@ model User {
   roleId    String
   role      Role     @relation(fields: [roleId], references: [id])
   booking Booking[]
+  review Review[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -67,7 +68,10 @@ model Hotel {
   heroImage String?
   propertyTypeId String?
   isFeatured Boolean @default(false)
+  avgReview Float @default(0)
+  reviewCount Int @default(0)
   room        Room[]
+  review Review[]
   hotelAmenities HotelAmenities[]
   imageGallery HotelImages[]
   city City? @relation(fields: [cityId], references: [id])
@@ -139,7 +143,7 @@ model Booking{
   status BookingStatus @default(PENDING)
   roomId String
   userId String
-
+  review Review?
   user User @relation(fields: [userId], references: [id])
   room Room @relation(fields: [roomId],references: [id])
 
@@ -155,4 +159,28 @@ enum BookingStatus{
   CHECKIN
   CHECKOUT
   CONFIRMED
+}
+
+model Review{
+  id String @id @default(cuid())
+  rating Int
+  comment String?
+  userId String
+  hotelId String
+  bookingId String @unique
+  status ReviewStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  hotel Hotel @relation(fields: [hotelId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+}
+
+enum ReviewStatus{
+  PENDING
+  REJECT
+  PUBLISH
 }

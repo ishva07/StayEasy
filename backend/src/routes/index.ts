@@ -9,6 +9,7 @@ import hotelImages from "../modules/hotelImageGallery/imagesGalleryRoutes";
 import dashboardRoute from "../modules/dashboard/dashboard.route";
 import cityRoute from "../modules/city/city.route";
 import propertyTypeRoute from "../modules/propertyType/propertyType.route";
+import reviewRoute from "../modules/reviews/reviews.route";
 
 const route = Router();
 
@@ -22,5 +23,6 @@ route.use("/hotels",hotelImages);
 route.use("/dashboard",dashboardRoute);
 route.use("/city",cityRoute);
 route.use("/property-type",propertyTypeRoute);
+route.use("/reviews",reviewRoute);
 
 export default route;

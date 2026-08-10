@@ -24,7 +24,13 @@ export const PERMISSIONS={
     VIEW_PROPERTY_TYPE:"view_property_type",
     ADD_PROPERTY_TYPE :"add_property_type",
     EDIT_PROPERTY_TYPE :"edit_property_type",
-    DELETE_PROPERTY_TYPE:"delete_property_type"
+    DELETE_PROPERTY_TYPE:"delete_property_type",
+    ADD_REVIEW:"add_review",
+    EDIT_REVIEW:"edit_review",
+    DELETE_REVIEW:"delete_review",
+    VIEW_MY_REVIEW:"view_my_review",
+    EDIT_REVIEW_STATUS:"edit_review_status",
+    VIEW_ALL_REVIEW:"view_all_review"
 }as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

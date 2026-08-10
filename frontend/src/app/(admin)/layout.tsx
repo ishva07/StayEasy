@@ -11,6 +11,7 @@ import {
   Hotel,
   LayoutDashboard,
   MapPin,
+  Star,
   Tag,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -66,6 +67,11 @@ export default function AdminLayout({
             label: "Bookings",
             href: "/admin/bookings",
             icon: CalendarCheck,
+          },
+          {
+            label: "Reviews",
+            href: "/admin/adminReviewsPage",
+            icon: Star,
           },
           {
             label: "Cities",
