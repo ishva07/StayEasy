@@ -12,17 +12,26 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const checkIn = searchParams.get("checkIn") ?? undefined;
+  const checkOut = searchParams.get("checkOut") ?? undefined;
+  const guests = searchParams.get("guests")
+    ? Number(searchParams.get("guests"))
+    : undefined;
+
   const city = searchParams.get("city") ?? undefined;
   const propertyType = searchParams.get("propertyType") ?? undefined;
-  const amenityIds = searchParams.get("amenityIds")?.split(",").filter(Boolean) ?? [];
+  const amenityIds =
+    searchParams.get("amenityIds")?.split(",").filter(Boolean) ?? [];
   const page = Number(searchParams.get("page") ?? 1);
-
   const { data: hotelsData, isLoading } = useHotels({
     page,
     limit: 12,
     city,
     propertyType,
     amenityIds,
+    checkIn,
+    checkOut,
+    guests,
   });
 
   const { data: cities } = getCity();
@@ -51,12 +60,18 @@ export default function SearchPage() {
   };
 
   const cityName = cities?.find((c: any) => c.id === city)?.name;
-  const propertyTypeName = propertyTypes?.find((t: any) => t.id === propertyType)?.name;
+  const propertyTypeName = propertyTypes?.find(
+    (t: any) => t.id === propertyType,
+  )?.name;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <h1 className="font-display text-2xl font-bold mb-2">
-        {cityName ? `Hotels in ${cityName}` : propertyTypeName ? `${propertyTypeName}s` : "All stays"}
+        {cityName
+          ? `Hotels in ${cityName}`
+          : propertyTypeName
+            ? `${propertyTypeName}s`
+            : "All stays"}
       </h1>
       <p className="text-sm text-muted-foreground mb-8">
         {hotelsData?.total ?? 0} properties found
@@ -107,7 +122,9 @@ export default function SearchPage() {
               )}
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">No stays match these filters.</p>
+            <p className="text-sm text-muted-foreground">
+              No stays match these filters.
+            </p>
           )}
         </div>
       </div>

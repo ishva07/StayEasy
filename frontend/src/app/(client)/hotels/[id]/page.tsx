@@ -59,9 +59,8 @@ export default function HotelDetailsPage() {
   }
 
   const heroUrl = getImageUrl(hotel.heroImage);
-  const avgRating = Number(hotel.avgRating ?? 0);
-  const reviewCount = Number(hotel.reviewCount ?? 0);
-
+const avgRating = Number(hotel.avgReview ?? hotel.avgRating ?? 0);
+const reviewCount = Number(hotel.reviewCount ?? 0);
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <button
@@ -165,8 +164,7 @@ export default function HotelDetailsPage() {
             </div>
           )}
 
-          {/* Reviews */}
-       {/* Reviews */}
+          
 <div className="space-y-6 pt-4 border-t border-border/60">
   <div className="flex items-center justify-between">
     <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-secondary-foreground">

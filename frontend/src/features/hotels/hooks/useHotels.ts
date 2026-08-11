@@ -11,6 +11,9 @@ interface UseHotelsParams {
   amenityIds?: string[];
   city?: string;
   propertyType?: string;
+  guests?: number;
+  checkIn?: string;
+  checkOut?: string;
 }
 
 export function useHotels({
@@ -23,10 +26,19 @@ export function useHotels({
   amenityIds,
   city,
   propertyType,
+  guests,
+  checkIn,
+  checkOut,
 }: UseHotelsParams = {}) {
   return useQuery({
-    queryKey: ["hotels", { page, limit, sortBy, order, search, featured, amenityIds, city, propertyType }],
+    queryKey: [
+      "hotels",
+      { page, limit, sortBy, order, search, featured, amenityIds, city, propertyType, guests, checkIn, checkOut },
+    ],
     queryFn: () =>
-      hotelService.getHotelService({ page, limit, sortBy, order, search, featured, amenityIds, city, propertyType }),
+      hotelService.getHotelService({
+        page, limit, sortBy, order, search, featured, amenityIds,
+        city, propertyType, guests, checkIn, checkOut,
+      }),
   });
 }

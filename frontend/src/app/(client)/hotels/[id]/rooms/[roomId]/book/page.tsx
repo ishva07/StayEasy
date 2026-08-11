@@ -87,11 +87,6 @@ export default function BookRoomPage() {
                 <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    {roomImageUrl ? (
-                      <div className="h-10 w-10 overflow-hidden rounded-md bg-muted">
-                        <img src={roomImageUrl} alt={room.name} className="h-full w-full object-cover" />
-                      </div>
-                    ) : null}
                     <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
                       {room.name}
                     </h1>

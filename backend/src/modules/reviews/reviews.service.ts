@@ -59,8 +59,6 @@ export const DeleteReviewService = async (id: string, userId: string) => {
 export const updateStatusService = async (id: string, status: ReviewStatus) => {
   const review = await prisma.review.findUnique({ where: { id } });
   if (!review) throw new ApiError(404, "Review not found.");
-  if (review.status !== ReviewStatus.PENDING)
-    throw new ApiError(400, "Only pending reviews can be moderated.");
 
   const updatedStatusReview = await prisma.$transaction(async (tx) => {
     const updated = await tx.review.update({ where: { id }, data: { status } });

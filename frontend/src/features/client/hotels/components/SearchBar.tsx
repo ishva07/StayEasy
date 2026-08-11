@@ -9,12 +9,18 @@ import { Button } from "@/components/ui/button";
 export function SearchBar() {
   const router = useRouter();
   const [city, setCity] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState(2);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (city.trim()) params.set("search", city.trim());
-    router.push(`/?${params.toString()}`);
+    if (checkIn) params.set("checkIn", checkIn);
+    if (checkOut) params.set("checkOut", checkOut);
+    if (guests) params.set("guests", String(guests));
+router.push(`/search?${params.toString()}`);
   };
 
   return (
@@ -37,24 +43,42 @@ export function SearchBar() {
       </div>
 
       <div className="flex-1 px-6 py-4 sm:border-r border-border/60">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
+        <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
           Check-In
-        </p>
-        <p className="text-sm text-muted-foreground/70">Add date</p>
+        </label>
+        <input
+          type="date"
+          value={checkIn}
+          min={new Date().toISOString().split("T")[0]}
+          onChange={(e) => setCheckIn(e.target.value)}
+          className="w-full border-0 bg-transparent p-0 text-sm text-foreground focus:outline-none"
+        />
       </div>
 
       <div className="flex-1 px-6 py-4 sm:border-r border-border/60">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
+        <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
           Check-out
-        </p>
-        <p className="text-sm text-muted-foreground/70">Add date</p>
+        </label>
+        <input
+          type="date"
+          value={checkOut}
+          min={checkIn || new Date().toISOString().split("T")[0]}
+          onChange={(e) => setCheckOut(e.target.value)}
+          className="w-full border-0 bg-transparent p-0 text-sm text-foreground focus:outline-none"
+        />
       </div>
 
       <div className="flex-1 px-6 py-4">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
+        <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
           Guests
-        </p>
-        <p className="text-sm text-muted-foreground/70">Add guests</p>
+        </label>
+        <input
+          type="number"
+          min={1}
+          value={guests}
+          onChange={(e) => setGuests(Number(e.target.value))}
+          className="w-full border-0 bg-transparent p-0 text-sm text-foreground focus:outline-none"
+        />
       </div>
 
       <div className="p-2 flex items-center">
