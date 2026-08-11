@@ -8,18 +8,13 @@ const items = [
 
 export function TrustStrip() {
   return (
-    <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+    <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12">
       {items.map(({ icon: Icon, label, desc }) => (
-        <div
-          key={label}
-          className="flex items-center gap-3 bg-card border border-border rounded-2xl px-5 py-4"
-        >
-          <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center shrink-0">
-            <Icon className="h-5 w-5 text-accent-foreground" />
-          </div>
-          <div>
-            <p className="text-sm font-medium">{label}</p>
-            <p className="text-xs text-muted-foreground">{desc}</p>
+        <div key={label} className="flex items-center gap-2.5">
+          <Icon className="h-4 w-4 text-primary shrink-0" />
+          <div className="text-left">
+            <p className="text-xs font-semibold uppercase tracking-wide">{label}</p>
+            <p className="text-[11px] text-muted-foreground">{desc}</p>
           </div>
         </div>
       ))}

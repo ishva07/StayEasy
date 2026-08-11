@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Star } from "lucide-react";
+import { Star, ArrowRight } from "lucide-react";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 interface HotelCardProps {
   hotel: {
@@ -11,22 +12,25 @@ interface HotelCardProps {
     city?: { id: string; name: string; images?: string } | null;
     heroImage?: string | null;
     isFeatured?: boolean;
+    avgReview?: number | null;
+    reviewCount?: number | null;
   };
 }
 
 export function HotelCard({ hotel }: HotelCardProps) {
-  const imageUrl = hotel.heroImage
-    ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}`
-    : null;
-  const isLocalUpload = imageUrl?.includes("localhost");
+  const imageUrl = getImageUrl(hotel.heroImage);
+  const isLocalUpload = imageUrl.includes("localhost");
+  const avgRating = Number(hotel.avgReview ?? 0);
+  const reviewCount = Number(hotel.reviewCount ?? 0);
 
   return (
     <Link
       href={`/hotels/${hotel.id}`}
-      className="group block rounded-2xl border border-border bg-card overflow-hidden
-                 shadow-sm hover:shadow-lg transition-shadow duration-300"
+      className="group block rounded-2xl overflow-hidden bg-card shadow-sm
+                 transition-shadow duration-300 hover:shadow-xl"
     >
-      <div className="relative h-48 w-full bg-muted">
+      {/* Photo + overlaid title block — one composition, not two */}
+      <div className="relative h-64 w-full bg-muted overflow-hidden">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -34,7 +38,7 @@ export function HotelCard({ hotel }: HotelCardProps) {
             fill
             unoptimized={isLocalUpload}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover group-hover:scale-[1.05] transition-transform duration-500"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-muted-foreground text-sm">
@@ -42,31 +46,50 @@ export function HotelCard({ hotel }: HotelCardProps) {
           </div>
         )}
 
+        {/* Scrim for legibility — always on, not just hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent pointer-events-none" />
+
         {hotel.isFeatured && (
-          <div className="absolute top-3 right-3">
-            <div className="bg-background/95 text-secondary-foreground text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm border border-secondary/40">
-              Featured
-            </div>
+          <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">
+            Featured
           </div>
         )}
-      </div>
 
-      <div className="p-4 space-y-1.5">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display text-base font-medium leading-snug truncate">
-            {hotel.name}
-          </h3>
-          <div className="flex items-center gap-0.5 shrink-0 text-secondary">
-            <Star className="h-3.5 w-3.5 fill-current" />
-            <span className="text-xs font-medium text-foreground">5.0</span>
-          </div>
+        <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md">
+          <Star className="h-3 w-3 fill-secondary text-secondary" />
+          <span className="text-xs font-bold text-white">
+            {avgRating > 0 ? avgRating.toFixed(1) : "New"}
+          </span>
+          {reviewCount > 0 && (
+            <span className="text-[10px] text-white/70">({reviewCount})</span>
+          )}
         </div>
 
-        {hotel.city && (
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <MapPin className="h-3 w-3" /> {hotel.city.name}
-          </p>
-        )}
+        {/* Title sits on the photo — no separate stacked block */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          {hotel.city && (
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="inline-block w-4 h-[2px] bg-primary" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/90">
+                {hotel.city.name}
+              </span>
+            </div>
+          )}
+          <h3 className="font-display text-lg font-black leading-tight text-white truncate">
+            {hotel.name}
+          </h3>
+        </div>
+      </div>
+
+      {/* Solid utility bar — meta + CTA, high contrast against the photo above */}
+      <div className="flex items-center justify-between px-4 py-3 bg-foreground">
+        <span className="text-xs font-medium text-background/60">
+          {reviewCount > 0 ? `${reviewCount} reviews` : "Explore rooms"}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary-foreground bg-primary px-3.5 py-1.5 rounded-md transition group-hover:brightness-110">
+          View
+          <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+        </span>
       </div>
     </Link>
   );

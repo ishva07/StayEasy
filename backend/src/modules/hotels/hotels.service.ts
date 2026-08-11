@@ -83,6 +83,9 @@ export const getHotelService = async ({
   amenityIds,
   city,
   propertyType,
+  guests,
+  checkIn,
+  checkOut,
 }: {
   page?: number;
   limit?: number;
@@ -93,9 +96,11 @@ export const getHotelService = async ({
   amenityIds?: string;
   city?: string;
   propertyType?: string;
+  guests?: string;
+  checkIn?: string;
+  checkOut?: string;
 }) => {
   const skip = (page - 1) * limit;
-
   const where: any = {};
 
   if (search) {
@@ -104,42 +109,47 @@ export const getHotelService = async ({
       { city: { name: { contains: search, mode: "insensitive" } } },
     ];
   }
-
-  if (featured === "true") {
-    where.isFeatured = true;
-  }
-
+  if (featured === "true") where.isFeatured = true;
   if (amenityIds) {
-    const idsArray = amenityIds.split(",");
-    where.hotelAmenities = {
-      some: {
-        amenitiesId: { in: idsArray },
+    where.hotelAmenities = { some: { amenitiesId: { in: amenityIds.split(",") } } };
+  }
+  if (city) where.cityId = city;
+  if (propertyType) where.propertyTypeId = propertyType;
+
+  const roomWhere: any = {};
+  if (guests) roomWhere.capacity = { gte: Number(guests) };
+  if (checkIn && checkOut) {
+    roomWhere.booking = {
+      none: {
+        status: { not: "CANCELED" },
+        checkIn: { lt: new Date(checkOut) },
+        checkOut: { gt: new Date(checkIn) },
       },
     };
   }
+  if (Object.keys(roomWhere).length > 0) where.room = { some: roomWhere };
 
-  if (city) {
-    where.cityId = city;
+  // Special case: "popular" sort — most reviewed first, avgReview as tiebreaker.
+  // Not part of allowedSortBy since it's a fixed multi-field sort, not a single dynamic column.
+  let orderBy: any;
+  if (sortBy === "popular") {
+    orderBy = [{ reviewCount: "desc" }, { avgReview: "desc" }];
+  } else {
+    const allowedSortBy = ["name", "createdAt", "city"];
+    const sortByFilter = allowedSortBy.includes(sortBy) ? sortBy : "createdAt";
+    const allowedOrder = ["asc", "desc"];
+    const orderFilter = allowedOrder.includes(order) ? order : "desc";
+    orderBy = { [sortByFilter]: orderFilter };
   }
-
-  if (propertyType) {
-    where.propertyTypeId = propertyType;
-  }
-
-  const allowedSortBy = ["name", "createdAt", "city"];
-  const sortByFilter = allowedSortBy.includes(sortBy) ? sortBy : "createdAt";
-
-  const allowedOrder = ["asc", "desc"];
-  const orderFilter = allowedOrder.includes(order) ? order : "desc";
 
   const [data, total] = await Promise.all([
     prisma.hotel.findMany({
       skip,
       take: limit,
       where,
-      orderBy: { [sortByFilter]: orderFilter },
+      orderBy,
       include: {
-        room:true,
+        room: true,
         hotelAmenities: { include: { amenities: true } },
         city: { select: { name: true } },
         propertyType: { select: { name: true } },
@@ -148,11 +158,5 @@ export const getHotelService = async ({
     prisma.hotel.count({ where }),
   ]);
 
-  return {
-    data,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
-  };
+  return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
 };

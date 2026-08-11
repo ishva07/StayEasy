@@ -21,6 +21,9 @@ export interface Hotel {
     name: string;
   } | null;                    
   isFeatured: boolean;
+  avgReview?: number | null;
+  avgRating?: number | null;
+  reviewCount?: number | null;
   hotelAmenities?: {
     id: string;
     amenities: { id: string; name: string };
