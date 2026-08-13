@@ -59,8 +59,8 @@ export default function HotelDetailsPage() {
   }
 
   const heroUrl = getImageUrl(hotel.heroImage);
-const avgRating = Number(hotel.avgReview ?? hotel.avgRating ?? 0);
-const reviewCount = Number(hotel.reviewCount ?? 0);
+  const avgRating = Number(hotel.avgReview ?? hotel.avgRating ?? 0);
+  const reviewCount = Number(hotel.reviewCount ?? 0);
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <button
@@ -164,52 +164,51 @@ const reviewCount = Number(hotel.reviewCount ?? 0);
             </div>
           )}
 
-          
-<div className="space-y-6 pt-4 border-t border-border/60">
-  <div className="flex items-center justify-between">
-    <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-secondary-foreground">
-      Guest Reviews
-    </p>
-  </div>
+          <div className="space-y-6 pt-4 border-t border-border/60">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-secondary-foreground">
+                Guest Reviews
+              </p>
+            </div>
 
-  {reviewCount > 0 ? (
-    <div className="flex items-center gap-5 rounded-2xl border border-border/60 bg-card p-5">
-      <div className="flex flex-col items-center justify-center rounded-xl bg-primary/10 px-5 py-3 flex-shrink-0">
-        <p className="font-display text-3xl font-bold text-primary leading-none">
-          {avgRating.toFixed(1)}
-        </p>
-        <RatingStars rating={avgRating} size={13} />
-      </div>
-      <div>
-        <p className="font-medium text-sm">
-          {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
-        </p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Based on verified stays at {hotel.name}
-        </p>
-      </div>
-    </div>
-  ) : (
-    <div className="rounded-2xl border border-dashed border-border/70 p-6 text-center">
-      <p className="text-sm font-medium">No reviews yet</p>
-      <p className="text-xs text-muted-foreground mt-1">
-        Be the first to share your experience at this stay.
-      </p>
-    </div>
-  )}
+            {reviewCount > 0 ? (
+              <div className="flex items-center gap-5 rounded-2xl border border-border/60 bg-card p-5">
+                <div className="flex flex-col items-center justify-center rounded-xl bg-primary/10 px-5 py-3 flex-shrink-0">
+                  <p className="font-display text-3xl font-bold text-primary leading-none">
+                    {avgRating.toFixed(1)}
+                  </p>
+                  <RatingStars rating={avgRating} size={13} />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">
+                    {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Based on verified stays at {hotel.name}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-border/70 p-6 text-center">
+                <p className="text-sm font-medium">No reviews yet</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Be the first to share your experience at this stay.
+                </p>
+              </div>
+            )}
 
-  <ReviewList hotelId={hotel.id} limit={3} />
+            <ReviewList hotelId={hotel.id} limit={3} />
 
-  {reviewCount > 3 && (
-    <button
-      onClick={() => setShowReviewsModal(true)}
-      className="text-sm font-medium text-primary underline underline-offset-2"
-    >
-      See all {reviewCount} reviews
-    </button>
-  )}
-</div>
-</div>
+            {reviewCount > 3 && (
+              <button
+                onClick={() => setShowReviewsModal(true)}
+                className="text-sm font-medium text-primary underline underline-offset-2"
+              >
+                See all {reviewCount} reviews
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Right column: available rooms */}
         <div className="space-y-4 w-full lg:w-[380px] lg:flex-shrink-0 lg:border-l lg:border-border/60 lg:pl-8">
@@ -275,10 +274,14 @@ const reviewCount = Number(hotel.reviewCount ?? 0);
           </div>
         </div>
       </div>
-      
-{showReviewsModal && (
-  <ReviewsModal hotelId={hotel.id} hotelName={hotel.name} onClose={() => setShowReviewsModal(false)} />
-)}
+
+      {showReviewsModal && (
+        <ReviewsModal
+          hotelId={hotel.id}
+          hotelName={hotel.name}
+          onClose={() => setShowReviewsModal(false)}
+        />
+      )}
     </div>
   );
 }

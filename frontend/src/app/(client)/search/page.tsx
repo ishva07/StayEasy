@@ -22,7 +22,10 @@ export default function SearchPage() {
   const propertyType = searchParams.get("propertyType") ?? undefined;
   const amenityIds =
     searchParams.get("amenityIds")?.split(",").filter(Boolean) ?? [];
+  const search = searchParams.get("search") ?? undefined; // NEW
+  const minRating = searchParams.get("minRating") ?? undefined; // NEW
   const page = Number(searchParams.get("page") ?? 1);
+
   const { data: hotelsData, isLoading } = useHotels({
     page,
     limit: 12,
@@ -32,6 +35,8 @@ export default function SearchPage() {
     checkIn,
     checkOut,
     guests,
+    search, // NEW
+    minRating: minRating ? Number(minRating) : undefined, // NEW - service expects a number
   });
 
   const { data: cities } = getCity();
@@ -85,6 +90,8 @@ export default function SearchPage() {
           selectedCity={city}
           selectedPropertyType={propertyType}
           selectedAmenities={amenityIds}
+          selectedSearch={search} 
+          selectedMinRating={minRating} 
           onChange={updateFilters}
         />
 

@@ -5,22 +5,36 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { getCity } from "@/features/city/hooks/useGetCity";
 
 export function SearchBar() {
   const router = useRouter();
-  const [city, setCity] = useState("");
+  const { data: cities } = getCity(); 
+
+  const [cityInput, setCityInput] = useState(""); 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(2);
+  const [guests, setGuests] = useState(1);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (city.trim()) params.set("search", city.trim());
+
+    const trimmed = cityInput.trim();
+    if (trimmed) {
+      const matchedCity = cities?.find(
+        (c: any) => c.name.toLowerCase() === trimmed.toLowerCase()
+      );
+      if (matchedCity) {
+        params.set("city", matchedCity.id);
+      }
+    }
+
     if (checkIn) params.set("checkIn", checkIn);
     if (checkOut) params.set("checkOut", checkOut);
     if (guests) params.set("guests", String(guests));
-router.push(`/search?${params.toString()}`);
+
+    router.push(`/search?${params.toString()}`);
   };
 
   return (
@@ -36,10 +50,16 @@ router.push(`/search?${params.toString()}`);
         </label>
         <Input
           placeholder="Where to?"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
+          value={cityInput}
+          onChange={(e) => setCityInput(e.target.value)}
+          list="city-options"
           className="border-0 shadow-none focus-visible:ring-0 px-0 h-6 text-sm font-medium"
         />
+        <datalist id="city-options">
+          {cities?.map((c: any) => (
+            <option key={c.id} value={c.name} />
+          ))}
+        </datalist>
       </div>
 
       <div className="flex-1 px-6 py-4 sm:border-r border-border/60">

@@ -14,6 +14,7 @@ interface UseHotelsParams {
   guests?: number;
   checkIn?: string;
   checkOut?: string;
+  minRating?:number
 }
 
 export function useHotels({
@@ -29,16 +30,42 @@ export function useHotels({
   guests,
   checkIn,
   checkOut,
+  minRating,
 }: UseHotelsParams = {}) {
   return useQuery({
     queryKey: [
       "hotels",
-      { page, limit, sortBy, order, search, featured, amenityIds, city, propertyType, guests, checkIn, checkOut },
+      {
+        page,
+        limit,
+        sortBy,
+        order,
+        search,
+        featured,
+        amenityIds,
+        city,
+        propertyType,
+        guests,
+        checkIn,
+        checkOut,
+        minRating, 
+      },
     ],
     queryFn: () =>
       hotelService.getHotelService({
-        page, limit, sortBy, order, search, featured, amenityIds,
-        city, propertyType, guests, checkIn, checkOut,
+        page,
+        limit,
+        sortBy,
+        order,
+        search,
+        featured,
+        amenityIds,
+        city,
+        propertyType,
+        guests,
+        checkIn,
+        checkOut,
+        minRating, 
       }),
   });
 }

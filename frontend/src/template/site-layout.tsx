@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { CompactSearchBar } from "./Compactsearchbar";
 
 export interface NavItem {
   label: string;
@@ -44,6 +45,8 @@ export function SiteLayout({
 }: SiteLayoutProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const showCompactSearch = pathname !== "/";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -80,8 +83,9 @@ export function SiteLayout({
             ))}
           </nav>
 
-          {/* Right side: auth-aware */}
           <div className="hidden md:flex items-center gap-3">
+            {showCompactSearch && <CompactSearchBar />}
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-2 rounded-full pl-1 pr-3 py-1 border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors">
@@ -170,9 +174,14 @@ export function SiteLayout({
           </button>
         </div>
 
-        {/* Mobile menu */}
         {mobileOpen && (
           <div className="md:hidden border-t border-border/60 px-4 py-3 space-y-1 bg-background/95 backdrop-blur-md">
+            {showCompactSearch && (
+              <div className="pb-3 mb-2 border-b border-border/60">
+                <CompactSearchBar />
+              </div>
+            )}
+
             {navItems.map(({ label, href }) => (
               <Link
                 key={href}
