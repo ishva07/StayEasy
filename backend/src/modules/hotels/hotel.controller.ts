@@ -58,10 +58,21 @@ export const getHotelController = asyncHandler(async (req: Request, res: Respons
   const guests = req.query.guests?.toString();
   const checkIn = req.query.checkIn?.toString();
   const checkOut = req.query.checkOut?.toString();
+  const minRating = req.query.minRating?.toString(); 
 
   const getHotels = await getHotelService({
-    page, limit, sortBy, order, search, featured, amenityIds,
-    city, propertyType, guests, checkIn, checkOut,
+    page, limit,
+    sortBy,
+    order,
+    search,
+    featured,
+    amenityIds,
+    city,
+    propertyType,
+    guests,
+    checkIn,
+    checkOut,
+    minRating,
   });
   res.status(200).json(new ApiResponse(true, "Hotel fetched successfully.", getHotels));
 });

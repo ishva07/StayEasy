@@ -73,6 +73,121 @@ export const getHotelsByIdService = async(id:string)=>{
     return hotelsById;
 }
 
+// ---- Shared param shape (import this in controller too, instead of duplicating) ----
+export interface GetHotelParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  order?: string;
+  search?: string;
+  featured?: string;
+  amenityIds?: string;
+  city?: string;
+  propertyType?: string;
+  guests?: string;
+  checkIn?: string;
+  checkOut?: string;
+  minRating?: string; 
+}
+ 
+function buildHotelFilters({
+  search,
+  featured,
+  amenityIds,
+  city,
+  propertyType,
+  minRating,
+}: {
+  search?: string;
+  featured?: string;
+  amenityIds?: string;
+  city?: string;
+  propertyType?: string;
+  minRating?: string;
+}) {
+  const where: any = {};
+ 
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: "insensitive" } },
+      { city: { name: { contains: search, mode: "insensitive" } } },
+    ];
+  }
+ 
+  if (featured === "true") where.isFeatured = true;
+  if (city) where.cityId = city;
+  if (propertyType) where.propertyTypeId = propertyType;
+ 
+  if (amenityIds) {
+    const ids = amenityIds.split(",").filter(Boolean);
+    if (ids.length > 0) {
+      where.AND = ids.map((id) => ({
+        hotelAmenities: { some: { amenitiesId: id } },
+      }));
+    }
+  }
+ 
+  if (minRating) {
+    const rating = Number(minRating);
+    if (!Number.isNaN(rating)) {
+      where.avgReview = { gte: rating };
+    }
+  }
+ 
+  return where;
+}
+ 
+function buildRoomFilters({
+  guests,
+  checkIn,
+  checkOut,
+}: {
+  guests?: string;
+  checkIn?: string;
+  checkOut?: string;
+}) {
+  const roomWhere: any = {};
+ 
+  if (guests) {
+    roomWhere.capacity = { gte: Number(guests) };
+  }
+ 
+  if (checkIn && checkOut) {
+    // Room must have NO overlapping non-canceled booking in the requested date range
+    roomWhere.booking = {
+      none: {
+        status: { not: "CANCELED" },
+        checkIn: { lt: new Date(checkOut) },
+        checkOut: { gt: new Date(checkIn) },
+      },
+    };
+  }
+ 
+  return roomWhere;
+}
+ 
+// ---- 3. Decides how results should be sorted ----
+function buildOrderBy(
+  sortBy: string,
+  order: string
+) {
+  if (sortBy === "popular") {
+    return [{ reviewCount: "desc" as const }, { avgReview: "desc" as const }];
+  }
+ 
+  const allowedSortBy = ["name", "createdAt"] as const;
+  const allowedOrder = ["asc", "desc"] as const;
+ 
+  const safeSortBy = (allowedSortBy as readonly string[]).includes(sortBy)
+    ? (sortBy as (typeof allowedSortBy)[number])
+    : "createdAt";
+  const safeOrder = (allowedOrder as readonly string[]).includes(order)
+    ? (order as (typeof allowedOrder)[number])
+    : "desc";
+ 
+  return { [safeSortBy]: safeOrder };
+}
+ 
 export const getHotelService = async ({
   page = 1,
   limit = 10,
@@ -86,62 +201,19 @@ export const getHotelService = async ({
   guests,
   checkIn,
   checkOut,
-}: {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  order?: string;
-  search?: string;
-  featured?: string;
-  amenityIds?: string;
-  city?: string;
-  propertyType?: string;
-  guests?: string;
-  checkIn?: string;
-  checkOut?: string;
-}) => {
+  minRating,
+}: GetHotelParams) => {
   const skip = (page - 1) * limit;
-  const where: any = {};
-
-  if (search) {
-    where.OR = [
-      { name: { contains: search, mode: "insensitive" } },
-      { city: { name: { contains: search, mode: "insensitive" } } },
-    ];
+ 
+  const where = buildHotelFilters({ search, featured, amenityIds, city, propertyType, minRating });
+  const roomWhere = buildRoomFilters({ guests, checkIn, checkOut });
+ 
+  if (Object.keys(roomWhere).length > 0) {
+    where.room = { some: roomWhere };
   }
-  if (featured === "true") where.isFeatured = true;
-  if (amenityIds) {
-    where.hotelAmenities = { some: { amenitiesId: { in: amenityIds.split(",") } } };
-  }
-  if (city) where.cityId = city;
-  if (propertyType) where.propertyTypeId = propertyType;
-
-  const roomWhere: any = {};
-  if (guests) roomWhere.capacity = { gte: Number(guests) };
-  if (checkIn && checkOut) {
-    roomWhere.booking = {
-      none: {
-        status: { not: "CANCELED" },
-        checkIn: { lt: new Date(checkOut) },
-        checkOut: { gt: new Date(checkIn) },
-      },
-    };
-  }
-  if (Object.keys(roomWhere).length > 0) where.room = { some: roomWhere };
-
-  // Special case: "popular" sort — most reviewed first, avgReview as tiebreaker.
-  // Not part of allowedSortBy since it's a fixed multi-field sort, not a single dynamic column.
-  let orderBy: any;
-  if (sortBy === "popular") {
-    orderBy = [{ reviewCount: "desc" }, { avgReview: "desc" }];
-  } else {
-    const allowedSortBy = ["name", "createdAt", "city"];
-    const sortByFilter = allowedSortBy.includes(sortBy) ? sortBy : "createdAt";
-    const allowedOrder = ["asc", "desc"];
-    const orderFilter = allowedOrder.includes(order) ? order : "desc";
-    orderBy = { [sortByFilter]: orderFilter };
-  }
-
+ 
+  const orderBy = buildOrderBy(sortBy, order);
+ 
   const [data, total] = await Promise.all([
     prisma.hotel.findMany({
       skip,
@@ -157,6 +229,7 @@ export const getHotelService = async ({
     }),
     prisma.hotel.count({ where }),
   ]);
-
+ 
   return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
 };
+ 

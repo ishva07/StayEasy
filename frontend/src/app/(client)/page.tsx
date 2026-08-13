@@ -44,6 +44,7 @@ export default function HomePage() {
           <TrustStrip />
         </section>
 
+        {/* 1. Featured stays — big cards, strong open */}
         <section className="max-w-6xl mx-auto px-4 pt-20">
           <div className="flex items-end justify-between mb-7">
             <div>
@@ -70,7 +71,46 @@ export default function HomePage() {
           )}
         </section>
 
+        {/* 2. Browse by city — medium cards */}
         <section className="max-w-6xl mx-auto px-4 pt-20">
+          <div className="mb-7">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">
+              Explore by destination
+            </p>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold">
+              Browse by city
+            </h2>
+          </div>
+          {isCitiesLoading ? (
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          ) : cities?.length ? (
+            <CityCarousel cities={cities} />
+          ) : (
+            <p className="text-sm text-muted-foreground">No cities yet.</p>
+          )}
+        </section>
+
+        {/* 3. Browse by property type — circles */}
+        <section className="max-w-6xl mx-auto px-4 pt-20">
+          <div className="mb-7">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">
+              Find your style
+            </p>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold">
+              Browse by property type
+            </h2>
+          </div>
+          {isTypesLoading ? (
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          ) : propertyTypes?.length ? (
+            <PropertyTypeCarousel types={propertyTypes} />
+          ) : (
+            <p className="text-sm text-muted-foreground">No property types yet.</p>
+          )}
+        </section>
+
+        {/* 4. Most popular stays — big cards again, strong close */}
+        <section className="max-w-6xl mx-auto px-4 pt-20 pb-20">
           <div className="flex items-end justify-between mb-7">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">
@@ -93,42 +133,6 @@ export default function HomePage() {
             <FeaturedCarousel hotels={popularData.data.filter((h: any) => h.reviewCount > 0)} />
           ) : (
             <p className="text-sm text-muted-foreground">Not enough reviews yet to show popular stays.</p>
-          )}
-        </section>
-
-        <section className="max-w-6xl mx-auto px-4 pt-20">
-          <div className="mb-7">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">
-              Explore by destination
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-semibold">
-              Browse by city
-            </h2>
-          </div>
-          {isCitiesLoading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
-          ) : cities?.length ? (
-            <CityCarousel cities={cities} />
-          ) : (
-            <p className="text-sm text-muted-foreground">No cities yet.</p>
-          )}
-        </section>
-
-        <section className="max-w-6xl mx-auto px-4 pt-20 pb-20">
-          <div className="mb-7">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1.5">
-              Find your style
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-semibold">
-              Browse by property type
-            </h2>
-          </div>
-          {isTypesLoading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
-          ) : propertyTypes?.length ? (
-            <PropertyTypeCarousel types={propertyTypes} />
-          ) : (
-            <p className="text-sm text-muted-foreground">No property types yet.</p>
           )}
 
           <div className="flex justify-center mt-10">
