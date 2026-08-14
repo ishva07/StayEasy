@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 interface FilterSidebarProps {
   cities?: { id: string; name: string }[];
   propertyTypes?: { id: string; name: string }[];
@@ -7,8 +9,12 @@ interface FilterSidebarProps {
   selectedCity?: string;
   selectedPropertyType?: string;
   selectedAmenities: string[];
+  selectedSearch?: string; 
+  selectedMinRating?: string;
   onChange: (updates: Record<string, string | string[] | null>) => void;
 }
+
+const RATING_OPTIONS = ["3", "4", "4.5"]; 
 
 export function FilterSidebar({
   cities,
@@ -17,8 +23,36 @@ export function FilterSidebar({
   selectedCity,
   selectedPropertyType,
   selectedAmenities,
+  selectedSearch,
+  selectedMinRating,
   onChange,
 }: FilterSidebarProps) {
+  const [searchInput, setSearchInput] = useState(selectedSearch ?? "");
+  const [isPending, setIsPending] = useState(false); 
+
+
+  useEffect(() => {
+    setSearchInput(selectedSearch ?? "");
+  }, [selectedSearch]);
+
+  useEffect(() => {
+    const trimmed = searchInput.trim();
+
+    if (trimmed === (selectedSearch ?? "")) return;
+
+    setIsPending(true);
+    const timeoutId = setTimeout(() => {
+      onChange({ search: trimmed ? trimmed : null });
+      setIsPending(false);
+    }, 400);
+
+    return () => {
+      clearTimeout(timeoutId);
+      setIsPending(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
   const toggleAmenity = (id: string) => {
     const next = selectedAmenities.includes(id)
       ? selectedAmenities.filter((a) => a !== id)
@@ -28,6 +62,36 @@ export function FilterSidebar({
 
   return (
     <aside className="space-y-8">
+      {/* Hotel name search */}
+      <div>
+        <h3 className="font-semibold mb-3 flex items-center gap-2">
+          Search by hotel name
+          {isPending && (
+            <span className="text-[10px] font-normal text-muted-foreground normal-case">
+              Searching...
+            </span>
+          )}
+        </h3>
+        <input
+          type="text"
+          placeholder="Hotel name..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="w-full text-sm border border-border rounded px-2 py-1.5 focus:outline-none focus:border-primary"
+        />
+        {selectedSearch && (
+          <button
+            onClick={() => {
+              setSearchInput("");
+              onChange({ search: null });
+            }}
+            className="text-xs text-primary underline mt-2"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
       {/* City */}
       <div>
         <h3 className="font-semibold mb-3">City</h3>
@@ -69,6 +133,29 @@ export function FilterSidebar({
         </div>
         {selectedPropertyType && (
           <button onClick={() => onChange({ propertyType: null })} className="text-xs text-primary underline mt-2">
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* Rating */}
+      <div>
+        <h3 className="font-semibold mb-3">Minimum rating</h3>
+        <div className="space-y-2">
+          {RATING_OPTIONS.map((rating) => (
+            <label key={rating} className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="minRating"
+                checked={selectedMinRating === rating}
+                onChange={() => onChange({ minRating: rating })}
+              />
+              <span>{rating}+ stars</span>
+            </label>
+          ))}
+        </div>
+        {selectedMinRating && (
+          <button onClick={() => onChange({ minRating: null })} className="text-xs text-primary underline mt-2">
             Clear
           </button>
         )}
