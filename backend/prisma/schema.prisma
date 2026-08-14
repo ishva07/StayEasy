@@ -78,6 +78,13 @@ model Hotel {
   propertyType PropertyType? @relation(fields: [propertyTypeId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([cityId])
+  @@index([propertyTypeId])
+  @@index([avgReview])
+  @@index([reviewCount])
+  @@index([isFeatured])
+  @@index([createdAt])
 }
 
 model Room {
@@ -94,6 +101,8 @@ model Room {
   updatedAt DateTime @updatedAt
 
   @@unique([name,hotelId])
+  @@index([hotelId])
+  @@index([capacity])
 }
 
 model Amenities{
@@ -112,6 +121,7 @@ model HotelAmenities{
   amenities Amenities @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
   
   @@unique([hotelId,amenitiesId])
+  @@index([amenitiesId])
 }
 
 model HotelImages{
@@ -150,6 +160,7 @@ model Booking{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([roomId,status,checkIn,checkOut])
 }
 
 

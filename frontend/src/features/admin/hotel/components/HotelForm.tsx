@@ -30,8 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetPropertyType } from "@/features/admin/propertyTypes/hooks/usePropertyTypeOptions";
-import { getCity } from "@/features/admin/city/hook/useGetCity";
+import { useGetPropertyType } from "@/features/propertyType/hooks/usePropertyTypeOptions";
+import { getCity } from "@/features/city/hooks/useGetCity";
 
 type FormInput = createHotelInputData | editHotelInputData;
 
