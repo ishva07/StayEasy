@@ -100,7 +100,7 @@ function BookingCard({
     STATUS_CONFIG[booking.status] ?? STATUS_CONFIG.PENDING;
 
   const imageUrl = booking.room?.roomImage
-    ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${booking.room.roomImage}`
+    ? `${booking.room.roomImage}`
     : "";
 
   const isCompleted = booking.status === "CHECKOUT";

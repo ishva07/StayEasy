@@ -24,7 +24,7 @@ export function getCityColumns({ onEdit, onDelete }: GetCityColumnsProps): Colum
       enableSorting: false,
       cell: ({ row }) => {
         const image = row.original.images;
-        const url = image ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${image}` : null;
+        const url = image ? `${image}` : null;
         return (
           <div className="h-12 w-16 rounded-md overflow-hidden bg-muted relative">
             {url ? (

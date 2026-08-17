@@ -42,12 +42,6 @@ export default function HotelDetailsPage() {
 
   const [showReviewsModal, setShowReviewsModal] = useState(false);
 
-  const UPLOADS_URL = process.env.NEXT_PUBLIC_UPLOADS_URL ?? "";
-
-  function getImageUrl(path?: string | null) {
-    if (!path) return "";
-    return `${UPLOADS_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  }
   if (isLoading) {
     return <p className="p-6 text-sm text-muted-foreground">Loading...</p>;
   }
@@ -58,7 +52,7 @@ export default function HotelDetailsPage() {
     );
   }
 
-  const heroUrl = getImageUrl(hotel.heroImage);
+  const heroUrl = hotel.heroImage;
   const avgRating = Number(hotel.avgReview ?? hotel.avgRating ?? 0);
   const reviewCount = Number(hotel.reviewCount ?? 0);
   return (
@@ -154,7 +148,7 @@ export default function HotelDetailsPage() {
                     className="aspect-square rounded-xl overflow-hidden bg-muted"
                   >
                     <img
-                      src={getImageUrl(img.url)}
+                      src={`${img.url}`}
                       alt=""
                       className="h-full w-full object-cover"
                     />
@@ -224,7 +218,7 @@ export default function HotelDetailsPage() {
           <div className="space-y-3">
             {hotel.room?.length > 0 ? (
               hotel.room.map((room: any) => {
-                const roomImageUrl = getImageUrl(room.roomImage);
+                const roomImageUrl = `${room.roomImage}`;
 
                 return (
                   <div

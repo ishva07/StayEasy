@@ -25,7 +25,7 @@ export function getHotelColumns({
       enableSorting: false,
       cell: ({ row }) => {
         const imageUrl = row.original.heroImage
-          ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${row.original.heroImage}`
+          ? `${row.original.heroImage}`
           : "";
 
         return (

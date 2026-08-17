@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { getImageUrl } from "@/lib/getImageUrl";
 import { useCarouselScroll, CarouselControls } from "./Usecarouselscroll";
 
 interface City {
@@ -21,7 +20,7 @@ export function CityCarousel({ cities }: { cities: City[] }) {
     <div>
       <div ref={carousel.scrollRef} className={scrollClassName}>
         {cities.map((city) => {
-          const imageSrc = getImageUrl(city.images);
+          const imageSrc = city.images;
 
           return (
             <Link

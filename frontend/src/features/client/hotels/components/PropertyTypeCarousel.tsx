@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { getImageUrl } from "@/lib/getImageUrl";
 import { useCarouselScroll, CarouselControls } from "./Usecarouselscroll"; 
 
 interface PropertyType {
@@ -22,7 +21,7 @@ export function PropertyTypeCarousel({ types }: { types: PropertyType[] }) {
     <div>
       <div ref={carousel.scrollRef} className={scrollClassName}>
         {types.map((type) => {
-          const imageSrc = getImageUrl(type.image);
+          const imageSrc = type.image;
 
           return (
             <Link

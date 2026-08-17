@@ -5,7 +5,7 @@ import ApiResponse from "../../utils/ApiResponse";
 
 export const createCityController = asyncHandler(async(req:Request,res:Response)=>{
     const name = req.body.name;
-    const cityImage = req.file? `/uploads/${req.file.filename}` : undefined
+    const cityImage = req.file? req.file.path : undefined
     const newCity = await createCityService(name,cityImage);
     res.status(201).json(new ApiResponse(true, "City created Successfully", newCity));
 })
@@ -13,7 +13,7 @@ export const createCityController = asyncHandler(async(req:Request,res:Response)
 export const editCityController = asyncHandler(async(req:Request,res:Response)=>{
     const name = req.body.name;
     const cityId = req.params.cityId.toString();
-        const cityImage = req.file? `/uploads/${req.file.filename}` : undefined
+    const cityImage = req.file? req.file.path : undefined
     const updatedCity = await editCityService(cityId,name,cityImage);
     res.status(200).json(new ApiResponse(true, "City updated Successfully", updatedCity));
 })

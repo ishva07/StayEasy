@@ -1,17 +1,14 @@
 import multer from "multer";
-import path from "node:path";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary";
 
-const uploadDir = path.join(process.cwd(), "uploads");
-
-const storage = multer.diskStorage({
-    destination(req, file, callback) {
-        callback(null,uploadDir)
-    },
-    filename(req, file, callback) {
-        const uniqueName = Date.now() + "-" + Math.round(Math.random()*1E9)
-        callback(null,uniqueName+path.extname(file.originalname));
-    },
-})
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async () => ({
+    folder: "stayeasy",
+    allowed_formats: ["jpeg", "png", "jpg"],
+  }),
+});
 
 const fileFilter = (req:any,file:Express.Multer.File,cb:any)=>{
     const allowedTypes = ["image/jpeg","image/png","image/jpg"];

@@ -26,7 +26,7 @@ export function getPropertyTypeColumns({
       enableSorting: false,
       cell: ({ row }) => {
         const image = row.original.image;
-        const url = image ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${image}` : null;
+        const url = image ? `${image}` : null;
         return (
           <div className="h-12 w-16 rounded-md overflow-hidden bg-muted">
             {url ? (

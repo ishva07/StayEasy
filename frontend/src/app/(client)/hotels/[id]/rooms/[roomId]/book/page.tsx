@@ -61,7 +61,7 @@ export default function BookRoomPage() {
   };
 
   const roomImageUrl = room.roomImage
-    ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${room.roomImage}`
+    ? `${room.roomImage}`
     : "";
 
   return (

@@ -97,7 +97,7 @@ function RoomsContent() {
     });
     setEditingRoom(room);
     setImagePreview(
-      room.roomImage ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${room.roomImage}` : null
+      room.roomImage ? `${room.roomImage}` : null
     );
     setFormOpen(true);
   };

@@ -39,7 +39,7 @@ export function EditHotelContent() {
   const initialGalleryUrls = useMemo(
     () =>
       hotel?.imageGallery?.map(
-        (img: any) => `${process.env.NEXT_PUBLIC_UPLOADS_URL}${img.url}`,
+        (img: any) => `${img.url}`,
       ) ?? [],
     [hotel?.imageGallery],
   );
@@ -84,7 +84,7 @@ export function EditHotelContent() {
         mode="edit"
         defaultValues={defaultValues}
         initialHeroImageUrl={
-          hotel.heroImage ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}` : null
+          hotel.heroImage ? `${hotel.heroImage}` : null
         }
         initialGalleryUrls={initialGalleryUrls}
         onSubmit={handleSubmit}
