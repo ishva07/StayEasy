@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect, RefObject } from "react";
 
 interface UseCarouselScrollResult {
-  scrollRef: RefObject<HTMLDivElement>;
+  scrollRef: RefObject<HTMLDivElement | null>;
   canScrollLeft: boolean;
   canScrollRight: boolean;
   pageCount: number;
@@ -109,10 +109,6 @@ export function CarouselControls({
   );
 }
 
-// Small local wrappers so this file's only external dependency is lucide-react,
-// same as the original three files - swap these two lines out for a direct
-// `import { ChevronLeft, ChevronRight } from "lucide-react"` and use those
-// components directly if you'd rather not have the wrapper indirection.
 import { ChevronLeft, ChevronRight } from "lucide-react";
 function ChevronLeftIcon() {
   return <ChevronLeft className="h-3.5 w-3.5" />;

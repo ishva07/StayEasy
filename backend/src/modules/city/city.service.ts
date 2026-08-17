@@ -24,7 +24,7 @@ export const editCityService = async (
     where: { id: cityId },
     data:{
         name,
-    cityImage
+        images:cityImage
     }
   });
   return editedCity;
