@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: stayeasy-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ishva2003
+      POSTGRES_DB: booking_hotel_rooms
+    ports:
+      - "5434:5432"
+    volumes:
+      - stayeasy-pgdata:/var/lib/postgresql/data
+    networks:
+      - stayeasy-network
+
+  backend:
+    build: ./backend
+    container_name: stayeasy-backend-container
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      - postgres
+    networks:
+      - stayeasy-network
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:5000/api/v1
+        NEXT_PUBLIC_UPLOADS_URL: http://localhost:5000
+    container_name: stayeasy-frontend-container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - stayeasy-network
+
+volumes:
+  stayeasy-pgdata:
+
+networks:
+  stayeasy-network:

@@ -7,8 +7,9 @@ import { useGetPropertyType } from "@/features/propertyType/hooks/usePropertyTyp
 import { useAmenityOptions } from "@/features/admin/amenities/hook/useAmenities";
 import { HotelCard } from "@/features/client/hotels/components/HotelCard";
 import { FilterSidebar } from "@/features/client/hotels/components/FilterSidebar";
+import { Suspense } from "react";
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -22,8 +23,8 @@ export default function SearchPage() {
   const propertyType = searchParams.get("propertyType") ?? undefined;
   const amenityIds =
     searchParams.get("amenityIds")?.split(",").filter(Boolean) ?? [];
-  const search = searchParams.get("search") ?? undefined; // NEW
-  const minRating = searchParams.get("minRating") ?? undefined; // NEW
+  const search = searchParams.get("search") ?? undefined; 
+  const minRating = searchParams.get("minRating") ?? undefined; 
   const page = Number(searchParams.get("page") ?? 1);
 
   const { data: hotelsData, isLoading } = useHotels({
@@ -106,7 +107,7 @@ export default function SearchPage() {
                 ))}
               </div>
 
-              {hotelsData.totalPages > 1 && (
+              {hotelsData.totalPage > 1 && (
                 <div className="flex items-center justify-center gap-4 mt-10">
                   <button
                     disabled={page <= 1}
@@ -116,10 +117,10 @@ export default function SearchPage() {
                     Previous
                   </button>
                   <span className="text-sm text-muted-foreground">
-                    Page {page} of {hotelsData.totalPages}
+                    Page {page} of {hotelsData.totalPage}
                   </span>
                   <button
-                    disabled={page >= hotelsData.totalPages}
+                    disabled={page >= hotelsData.totalPage}
                     onClick={() => goToPage(page + 1)}
                     className="px-3 py-1.5 text-sm border border-border rounded disabled:opacity-40"
                   >
@@ -136,5 +137,14 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }
