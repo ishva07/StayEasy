@@ -7,7 +7,7 @@ import ApiResponse from "../../utils/ApiResponse";
 export const createRoomsController = asyncHandler(async(req:Request,res:Response)=>{
     const {name,capacity,price} = req.body;
     const hotelId = req.params.hotelId.toString();
-    const roomImage = req.file ? `/uploads/${req.file.filename}` : null;
+    const roomImage = req.file ? req.file.path : null;
     const newRoom = await createRoomService({name,capacity,hotelId,price,roomImage});
     res.status(201).json(new ApiResponse(true,"Room Created Successfully",newRoom));
 })
@@ -22,7 +22,7 @@ export const updateRoomController  = asyncHandler(async(req:Request,res:Response
       if(capacity != undefined) data.capacity = Number(capacity);
 
       if(req.file)
-        data.roomImage = `/uploads/${req.file.filename}`
+        data.roomImage = req.file.path
 
     const updatedRoom = await editRoomService(hotelId,roomId,data);
     res.status(200).json(new ApiResponse(true,"Room Updated Successfully",updatedRoom));

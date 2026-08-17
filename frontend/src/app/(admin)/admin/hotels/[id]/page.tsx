@@ -44,7 +44,7 @@ function HotelDetailContent() {
       {hotel.heroImage && (
         <div className="relative h-64 w-full rounded-lg overflow-hidden bg-muted">
           <img
-            src={`${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}`}
+            src={`${hotel.heroImage}`}
             alt={hotel.name}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
@@ -87,7 +87,7 @@ function HotelDetailContent() {
             {hotel.imageGallery.map((img: any) => (
               <div key={img.id} className="relative h-24 rounded-md overflow-hidden bg-muted">
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_UPLOADS_URL}${img.url}`}
+                  src={`${img.url}`}
                   alt=""
                   fill
                   className="object-cover"

@@ -80,7 +80,7 @@ function PropertyTypeContent() {
     form.reset({ name: propertyType.name, propertyTypeImage: undefined });
     setEditingPropertyType(propertyType);
     setImagePreview(
-      propertyType.image ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${propertyType.image}` : null
+      propertyType.image ? `${propertyType.image}` : null
     );
     setFormOpen(true);
   };

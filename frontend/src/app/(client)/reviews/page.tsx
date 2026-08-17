@@ -100,7 +100,7 @@ function MyReviewsContent() {
             const status = STATUS_CONFIG[review.status] ?? STATUS_CONFIG.PENDING;
             const StatusIcon = status.icon;
             const imageUrl = review.hotel?.heroImage
-              ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${review.hotel.heroImage}`
+              ? `${review.hotel.heroImage}`
               : "";
 
             return (

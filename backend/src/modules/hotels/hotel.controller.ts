@@ -11,9 +11,9 @@ export const createHotelController = asyncHandler(async (req: Request, res: Resp
     imageGallery?: Express.Multer.File[];
   };
 
-  const heroImage = files?.heroImage?.[0] ? `/uploads/${files.heroImage[0].filename}` : "";
+  const heroImage = files?.heroImage?.[0]?.path ?? "";
   const imageGallery = files?.imageGallery?.length
-    ? files.imageGallery.map((file) => `/uploads/${file.filename}`)
+    ? files.imageGallery.map((file) => file.path)
     : [];
 
   const newHotel = await createHotelsService({
@@ -26,7 +26,7 @@ export const createHotelController = asyncHandler(async (req: Request, res: Resp
 export const editHotelController = asyncHandler(async(req:Request,res:Response)=>{
     const id = req.params.id.toString();
     const {name,description,cityId,address,isFeatured, propertyTypeId} = req.body;
-    const heroImage = req.file? `/uploads/${req.file.filename}` : undefined;
+    const heroImage = req.file? req.file.path : undefined;
 
     const updatedHotel = await editHotelsService(id,{name,description,cityId,address,isFeatured,heroImage,propertyTypeId})
     res.status(200).json(new ApiResponse(true,"hotel updated successfully",updatedHotel));

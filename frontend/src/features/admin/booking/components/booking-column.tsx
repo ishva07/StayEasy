@@ -60,7 +60,7 @@ export function getBookingColumns({ onStatusChange, isUpdating, canChangeStatus 
                 <div className="flex items-center gap-3">
                     {row.original.room?.roomImage ? (
                         <div className="h-10 w-10 overflow-hidden rounded-md bg-muted">
-                            <img src={`${process.env.NEXT_PUBLIC_UPLOADS_URL}${row.original.room.roomImage}`} alt={row.original.room?.name ?? "room"} className="h-full w-full object-cover" />
+                            <img src={`${row.original.room.roomImage}`} alt={row.original.room?.name ?? "room"} className="h-full w-full object-cover" />
                         </div>
                     ) : null}
                     <div>

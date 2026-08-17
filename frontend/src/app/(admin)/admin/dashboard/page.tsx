@@ -176,7 +176,7 @@ export function DashboardContent() {
           <div className="space-y-3">
             {recentHotels.map((hotel: any) => {
               const imageUrl = hotel.heroImage
-                ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${hotel.heroImage}`
+                ? `${hotel.heroImage}`
                 : "";
               const hotelCity =
                 hotel.city && typeof hotel.city === "object"

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Star, ArrowRight } from "lucide-react";
-import { getImageUrl } from "@/lib/getImageUrl";
 
 interface HotelCardProps {
   hotel: {
@@ -18,8 +17,7 @@ interface HotelCardProps {
 }
 
 export function HotelCard({ hotel }: HotelCardProps) {
-  const imageUrl = getImageUrl(hotel.heroImage);
-  const isLocalUpload = imageUrl.includes("localhost");
+  const imageUrl = hotel.heroImage;
   const avgRating = Number(hotel.avgReview ?? 0);
   const reviewCount = Number(hotel.reviewCount ?? 0);
 
@@ -36,7 +34,6 @@ export function HotelCard({ hotel }: HotelCardProps) {
             src={imageUrl}
             alt={hotel.name}
             fill
-            unoptimized={isLocalUpload}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
           />

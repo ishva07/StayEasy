@@ -30,7 +30,7 @@ export function getRoomColumns({
     enableSorting: false,
     cell: ({ row }) => {
         const imageUrl = row.original.roomImage
-            ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${row.original.roomImage}`   // 👈 same variable
+            ? `${row.original.roomImage}`   
             : "";
 
         return (

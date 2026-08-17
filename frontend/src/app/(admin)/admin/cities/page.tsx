@@ -77,7 +77,7 @@ function CityContent() {
     form.reset({ name: city.name, cityImage: undefined });
     setEditingCity(city);
     setImagePreview(
-      city.images ? `${process.env.NEXT_PUBLIC_UPLOADS_URL}${city.images}` : null
+      city.images ? `${city.images}` : null
     );
     setFormOpen(true);
   };
