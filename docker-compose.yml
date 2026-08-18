@@ -20,8 +20,6 @@ services:
       - "5000:5000"
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend/uploads:/app/uploads
     depends_on:
       - postgres
     networks:
@@ -32,7 +30,6 @@ services:
       context: ./frontend
       args:
         NEXT_PUBLIC_API_URL: http://localhost:5000/api/v1
-        NEXT_PUBLIC_UPLOADS_URL: http://localhost:5000
     container_name: stayeasy-frontend-container
     ports:
       - "3000:3000"
