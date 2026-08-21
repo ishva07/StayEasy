@@ -3,8 +3,8 @@ import prisma from '../src/config/db';
 
 const allPropertyTypes = Object.values(PROPERTYTYPE)
 
-export async function main(){
-    const propertyType = await Promise.all(
+export async function seedPropertyTypes(){
+        const propertyType = await Promise.all(
         allPropertyTypes.map((property)=>(
             prisma.propertyType.upsert({
                 where:{name:property.name},
@@ -16,5 +16,3 @@ export async function main(){
 
     console.log("Property type added successfully",propertyType)
 }
-
-main().catch((error)=>console.log(error)).finally(async()=>await prisma.$disconnect());
