@@ -5,7 +5,7 @@ import prisma from "../config/db";
 
 export const authenticate = ()=> async ( req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.cookies?.access_user;
+    const token = req.cookies?.access_token;
 
     if (!token) throw new ApiError(401, "user not Logged in");
 
