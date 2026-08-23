@@ -6,7 +6,12 @@ import env from "./config/env";
 import cookieParser from "cookie-parser";
 import route from "./routes";
 import cors from "cors"
+import { globalLimiter } from "./middleware/rateLimit.middleware";
 const app = express()
+
+app.set("trust proxy", 1);
+
+app.use(globalLimiter);
 
 app.use(
   cors({

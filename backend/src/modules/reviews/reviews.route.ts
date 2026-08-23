@@ -13,12 +13,13 @@ import {
   updateStatusController,
 } from "./review.Controller";
 import { PERMISSIONS } from "../../constant/permissions";
+import { writeLimiter } from "../../middleware/rateLimit.middleware";
 
 const reviewRoute = Router();
 
 reviewRoute.get("/hotel/:hotelId", getHotelReviewsController);
 
-reviewRoute.post("/", authenticate(), hasPermission(PERMISSIONS.ADD_REVIEW), validate(createReviewSchema), createReviewController);
+reviewRoute.post("/", authenticate(), hasPermission(PERMISSIONS.ADD_REVIEW), writeLimiter, validate(createReviewSchema), createReviewController);
 reviewRoute.get("/me", authenticate(),hasPermission(PERMISSIONS.VIEW_MY_REVIEW), getAllMyReviewController);
 reviewRoute.patch("/:id", authenticate(),hasPermission(PERMISSIONS.EDIT_REVIEW), validate(updateReviewSchema), updateReviewController);
 reviewRoute.delete("/:id", authenticate(), hasPermission(PERMISSIONS.DELETE_REVIEW), deleteReviewController);
