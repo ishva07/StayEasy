@@ -5,10 +5,11 @@ import { bookingController, cancelBookingController, changeBookingStatusControll
 import { authenticate } from '../../middleware/auth.middleware';
 import { hasPermission } from "../../middleware/permission.middleware";
 import { PERMISSIONS } from "../../constant/permissions";
+import { writeLimiter } from "../../middleware/rateLimit.middleware";
 
 const bookingRoute = Router();
 
-bookingRoute.post("/",authenticate(),hasPermission(PERMISSIONS.ADD_BOOKiNG),validate(bookingSchema),bookingController);
+bookingRoute.post("/",authenticate(), hasPermission(PERMISSIONS.ADD_BOOKiNG), writeLimiter,validate(bookingSchema),bookingController);
 bookingRoute.patch("/:bookingId/cancel",authenticate(),hasPermission(PERMISSIONS.CANCEL_BOOKING),cancelBookingController);
 bookingRoute.put("/:bookingId/status",authenticate(),hasPermission(PERMISSIONS.CHANGE_BOOKiNG_STATUS),changeBookingStatusController);
 bookingRoute.get("/myBookings",authenticate(),hasPermission(PERMISSIONS.VIEW_MY_BOOKING),getMyBookingsController);
