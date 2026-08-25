@@ -11,7 +11,6 @@ RUN npx prisma generate
 COPY tsconfig.json ./
 COPY tsconfig.seed.json ./
 COPY src ./src
-COPY public ./public
 
 RUN npm run build
 RUN npx tsc -p tsconfig.seed.json
@@ -28,7 +27,6 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/public ./public
 
 RUN mkdir -p uploads
 
