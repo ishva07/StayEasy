@@ -18,7 +18,7 @@ export const updateHotelImageController = asyncHandler(async (req: Request, res:
         throw new ApiError(400, "At least one image is required");
     }
 
-    const urls = files.map((file) => `/uploads/${file.filename}`);
+    const urls = files.map((file) => file.path);
 
     const updatedImagesOfHotel = await updateHotelImageService(hotelId, urls);
     res.status(200).json(new ApiResponse(true, "Gallery images updated successfully.", updatedImagesOfHotel));

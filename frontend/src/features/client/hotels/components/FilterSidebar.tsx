@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { PriceRangeSlider } from "./PriceRangeSlider";
 
 interface FilterSidebarProps {
   cities?: { id: string; name: string }[];
@@ -9,12 +10,14 @@ interface FilterSidebarProps {
   selectedCity?: string;
   selectedPropertyType?: string;
   selectedAmenities: string[];
-  selectedSearch?: string; 
+  selectedSearch?: string;
   selectedMinRating?: string;
+  selectedMinPrice?: string;
+  selectedMaxPrice?: string;
   onChange: (updates: Record<string, string | string[] | null>) => void;
 }
 
-const RATING_OPTIONS = ["3", "4", "4.5"]; 
+const RATING_OPTIONS = ["3", "4", "4.5"];
 
 export function FilterSidebar({
   cities,
@@ -25,11 +28,12 @@ export function FilterSidebar({
   selectedAmenities,
   selectedSearch,
   selectedMinRating,
+  selectedMinPrice,
+  selectedMaxPrice,
   onChange,
 }: FilterSidebarProps) {
   const [searchInput, setSearchInput] = useState(selectedSearch ?? "");
-  const [isPending, setIsPending] = useState(false); 
-
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
     setSearchInput(selectedSearch ?? "");
@@ -97,7 +101,10 @@ export function FilterSidebar({
         <h3 className="font-semibold mb-3">City</h3>
         <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
           {cities?.map((c) => (
-            <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer">
+            <label
+              key={c.id}
+              className="flex items-center gap-2 text-sm cursor-pointer"
+            >
               <input
                 type="radio"
                 name="city"
@@ -109,7 +116,10 @@ export function FilterSidebar({
           ))}
         </div>
         {selectedCity && (
-          <button onClick={() => onChange({ city: null })} className="text-xs text-primary underline mt-2">
+          <button
+            onClick={() => onChange({ city: null })}
+            className="text-xs text-primary underline mt-2"
+          >
             Clear
           </button>
         )}
@@ -120,7 +130,10 @@ export function FilterSidebar({
         <h3 className="font-semibold mb-3">Property type</h3>
         <div className="space-y-2">
           {propertyTypes?.map((type) => (
-            <label key={type.id} className="flex items-center gap-2 text-sm cursor-pointer">
+            <label
+              key={type.id}
+              className="flex items-center gap-2 text-sm cursor-pointer"
+            >
               <input
                 type="radio"
                 name="propertyType"
@@ -132,7 +145,10 @@ export function FilterSidebar({
           ))}
         </div>
         {selectedPropertyType && (
-          <button onClick={() => onChange({ propertyType: null })} className="text-xs text-primary underline mt-2">
+          <button
+            onClick={() => onChange({ propertyType: null })}
+            className="text-xs text-primary underline mt-2"
+          >
             Clear
           </button>
         )}
@@ -143,7 +159,10 @@ export function FilterSidebar({
         <h3 className="font-semibold mb-3">Minimum rating</h3>
         <div className="space-y-2">
           {RATING_OPTIONS.map((rating) => (
-            <label key={rating} className="flex items-center gap-2 text-sm cursor-pointer">
+            <label
+              key={rating}
+              className="flex items-center gap-2 text-sm cursor-pointer"
+            >
               <input
                 type="radio"
                 name="minRating"
@@ -155,10 +174,24 @@ export function FilterSidebar({
           ))}
         </div>
         {selectedMinRating && (
-          <button onClick={() => onChange({ minRating: null })} className="text-xs text-primary underline mt-2">
+          <button
+            onClick={() => onChange({ minRating: null })}
+            className="text-xs text-primary underline mt-2"
+          >
             Clear
           </button>
         )}
+      </div>
+
+      <div>
+        <h3 className="font-semibold mb-3">Price range</h3>
+        <div className="flex items-center gap-2">
+          <PriceRangeSlider
+            selectedMinPrice={selectedMinPrice}
+            selectedMaxPrice={selectedMaxPrice}
+            onChange={onChange}
+          />
+        </div>
       </div>
 
       {/* Amenities */}
@@ -166,7 +199,10 @@ export function FilterSidebar({
         <h3 className="font-semibold mb-3">Amenities</h3>
         <div className="space-y-2">
           {amenitiesList?.map((amenity) => (
-            <label key={amenity.id} className="flex items-center gap-2 text-sm cursor-pointer">
+            <label
+              key={amenity.id}
+              className="flex items-center gap-2 text-sm cursor-pointer"
+            >
               <input
                 type="checkbox"
                 checked={selectedAmenities.includes(amenity.id)}
@@ -177,7 +213,10 @@ export function FilterSidebar({
           ))}
         </div>
         {selectedAmenities.length > 0 && (
-          <button onClick={() => onChange({ amenityIds: [] })} className="text-xs text-primary underline mt-2">
+          <button
+            onClick={() => onChange({ amenityIds: [] })}
+            className="text-xs text-primary underline mt-2"
+          >
             Clear
           </button>
         )}

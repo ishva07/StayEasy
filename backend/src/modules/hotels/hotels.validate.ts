@@ -1,5 +1,10 @@
 import z from "zod";
 
+const multipartBoolean = z.preprocess(
+  (value) => (typeof value === "string" ? value === "true" : value),
+  z.boolean().optional(),
+);
+
 export const createHotelSchema = z.object({
   body: z.object({
     name: z.string().min(2, "Hotel name should be of minimum 2 characters."),
@@ -9,7 +14,7 @@ export const createHotelSchema = z.object({
     cityId: z.string(),
     propertyTypeId: z.string(),
     address: z.string(),
-    isFeatured: z.coerce.boolean().optional(),
+    isFeatured: multipartBoolean,
     amenitiesIds: z.preprocess((val) => {
       if (typeof val === "string") {
         try {
@@ -36,6 +41,6 @@ export const editHotelSchema = z.object({
     cityId: z.string().optional(),
     propertyTypeId: z.string(),
     address: z.string().optional(),
-    isFeatured: z.coerce.boolean().optional(),
+    isFeatured: multipartBoolean,
   }),
 });
