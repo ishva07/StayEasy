@@ -3,7 +3,7 @@ export interface HotelResponse<T>{
    total:number;
    page:number;
    limit:number;
-   totalPage:number;
+  totalPages:number;
 }
 
 export interface Hotel {

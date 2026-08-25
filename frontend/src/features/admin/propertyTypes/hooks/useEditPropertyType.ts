@@ -5,11 +5,7 @@ import { toast } from "sonner";
 export function useEditPropertyType() {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: ({
-      propertyTypeId,
-      name,
-      propertyTypeImage,
-    }: {
+    mutationFn: ({ propertyTypeId, name, propertyTypeImage }: {
       propertyTypeId: string;
       name?: string;
       propertyTypeImage?: File;

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { hotelService } from "../../hotels/services/hotel.service";
 
 interface UseHotelsParams {
@@ -14,7 +14,9 @@ interface UseHotelsParams {
   guests?: number;
   checkIn?: string;
   checkOut?: string;
-  minRating?:number
+  minRating?: number;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export function useHotels({
@@ -31,6 +33,8 @@ export function useHotels({
   checkIn,
   checkOut,
   minRating,
+  minPrice,
+  maxPrice
 }: UseHotelsParams = {}) {
   return useQuery({
     queryKey: [
@@ -48,9 +52,12 @@ export function useHotels({
         guests,
         checkIn,
         checkOut,
-        minRating, 
+        minRating,
+        minPrice,
+        maxPrice, 
       },
     ],
+    placeholderData: keepPreviousData,
     queryFn: () =>
       hotelService.getHotelService({
         page,
@@ -65,7 +72,9 @@ export function useHotels({
         guests,
         checkIn,
         checkOut,
-        minRating, 
+        minRating,
+        minPrice,
+        maxPrice, 
       }),
   });
 }

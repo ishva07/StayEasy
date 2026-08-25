@@ -77,7 +77,7 @@ export function HotelsContent() {
                 <DataTable
                     columns={columns}
                     data={data?.data ?? []}
-                    pageCount={data?.totalPage ?? 0}
+                    pageCount={data?.totalPages ?? 0}
                     pagination={pagination}
                     onPaginationChange={setPagination}
                     sorting={sorting}

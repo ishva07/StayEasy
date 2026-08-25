@@ -59,6 +59,8 @@ export const getHotelController = asyncHandler(async (req: Request, res: Respons
   const checkIn = req.query.checkIn?.toString();
   const checkOut = req.query.checkOut?.toString();
   const minRating = req.query.minRating?.toString(); 
+  const minPrice = req.query.minPrice?.toString();
+  const maxPrice = req.query.maxPrice?.toString();
 
   const getHotels = await getHotelService({
     page, limit,
@@ -73,6 +75,8 @@ export const getHotelController = asyncHandler(async (req: Request, res: Respons
     checkIn,
     checkOut,
     minRating,
+    minPrice,
+    maxPrice,
   });
   res.status(200).json(new ApiResponse(true, "Hotel fetched successfully.", getHotels));
 });

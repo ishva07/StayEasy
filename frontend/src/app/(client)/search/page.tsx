@@ -23,9 +23,11 @@ function SearchPageContent() {
   const propertyType = searchParams.get("propertyType") ?? undefined;
   const amenityIds =
     searchParams.get("amenityIds")?.split(",").filter(Boolean) ?? [];
-  const search = searchParams.get("search") ?? undefined; 
-  const minRating = searchParams.get("minRating") ?? undefined; 
+  const search = searchParams.get("search") ?? undefined;
+  const minRating = searchParams.get("minRating") ?? undefined;
   const page = Number(searchParams.get("page") ?? 1);
+  const minPrice = searchParams.get("minPrice") ?? undefined;
+  const maxPrice = searchParams.get("maxPrice") ?? undefined;
 
   const { data: hotelsData, isLoading } = useHotels({
     page,
@@ -36,8 +38,10 @@ function SearchPageContent() {
     checkIn,
     checkOut,
     guests,
-    search, // NEW
-    minRating: minRating ? Number(minRating) : undefined, // NEW - service expects a number
+    search,
+    minRating: minRating ? Number(minRating) : undefined,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
   });
 
   const { data: cities } = getCity();
@@ -91,9 +95,11 @@ function SearchPageContent() {
           selectedCity={city}
           selectedPropertyType={propertyType}
           selectedAmenities={amenityIds}
-          selectedSearch={search} 
-          selectedMinRating={minRating} 
+          selectedSearch={search}
+          selectedMinRating={minRating}
           onChange={updateFilters}
+          selectedMinPrice={minPrice}
+          selectedMaxPrice={maxPrice}
         />
 
         <div>
@@ -107,7 +113,7 @@ function SearchPageContent() {
                 ))}
               </div>
 
-              {hotelsData.totalPage > 1 && (
+              {hotelsData.totalPages > 1 && (
                 <div className="flex items-center justify-center gap-4 mt-10">
                   <button
                     disabled={page <= 1}
@@ -117,10 +123,10 @@ function SearchPageContent() {
                     Previous
                   </button>
                   <span className="text-sm text-muted-foreground">
-                    Page {page} of {hotelsData.totalPage}
+                    Page {page} of {hotelsData.totalPages}
                   </span>
                   <button
-                    disabled={page >= hotelsData.totalPage}
+                    disabled={page >= hotelsData.totalPages}
                     onClick={() => goToPage(page + 1)}
                     className="px-3 py-1.5 text-sm border border-border rounded disabled:opacity-40"
                   >
@@ -139,7 +145,6 @@ function SearchPageContent() {
     </div>
   );
 }
-
 
 export default function SearchPage() {
   return (

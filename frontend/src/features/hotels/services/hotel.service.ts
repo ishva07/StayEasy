@@ -15,7 +15,9 @@ getHotelService: async ({
   guests,
   checkIn,
   checkOut,
-  minRating, 
+  minRating,
+  minPrice,
+  maxPrice,
 }: {
   page?: number;
   limit?: number;
@@ -30,6 +32,8 @@ getHotelService: async ({
   checkIn?: string;
   checkOut?: string;
   minRating?: number;
+  minPrice?: number;
+  maxPrice?: number;
 }): Promise<HotelResponse<Hotel>> => {
   const response = await api.get("/hotels", {
     params: {
@@ -46,6 +50,8 @@ getHotelService: async ({
       checkIn: checkIn || undefined,
       checkOut: checkOut || undefined,
       minRating: minRating || undefined,
+      minPrice: minPrice || undefined,
+      maxPrice: maxPrice || undefined,
     },
   });
   return response.data.data;

@@ -29,7 +29,10 @@ export const createHotelsService = async(data:CreateHotelInterface) =>{
                 }))
             })
         }
-        return hotel;
+        return tx.hotel.findUnique({
+          where: { id: hotel.id },
+          include: { imageGallery: true },
+        });
     });
 
     return newHotel;
@@ -87,7 +90,9 @@ export interface GetHotelParams {
   guests?: string;
   checkIn?: string;
   checkOut?: string;
-  minRating?: string; 
+  minRating?: string;
+  minPrice?: string;
+  maxPrice?: string; 
 }
  
 function buildHotelFilters({
@@ -141,19 +146,22 @@ function buildRoomFilters({
   guests,
   checkIn,
   checkOut,
+  minPrice,
+  maxPrice,
 }: {
   guests?: string;
   checkIn?: string;
   checkOut?: string;
+  minPrice?: string;
+  maxPrice?: string;
 }) {
   const roomWhere: any = {};
- 
+
   if (guests) {
     roomWhere.capacity = { gte: Number(guests) };
   }
- 
+
   if (checkIn && checkOut) {
-    // Room must have NO overlapping non-canceled booking in the requested date range
     roomWhere.booking = {
       none: {
         status: { not: "CANCELED" },
@@ -162,7 +170,21 @@ function buildRoomFilters({
       },
     };
   }
- 
+
+  if (minPrice || maxPrice) {
+    let min = minPrice && !Number.isNaN(Number(minPrice)) ? Number(minPrice) : undefined;
+    let max = maxPrice && !Number.isNaN(Number(maxPrice)) ? Number(maxPrice) : undefined;
+
+    if (min !== undefined && max !== undefined && min > max) {
+      [min, max] = [max, min];
+    }
+
+    roomWhere.price = {
+      ...(min !== undefined && { gte: min }),
+      ...(max !== undefined && { lte: max }),
+    };
+  }
+
   return roomWhere;
 }
  
@@ -202,11 +224,13 @@ export const getHotelService = async ({
   checkIn,
   checkOut,
   minRating,
+  minPrice,
+  maxPrice,
 }: GetHotelParams) => {
   const skip = (page - 1) * limit;
  
   const where = buildHotelFilters({ search, featured, amenityIds, city, propertyType, minRating });
-  const roomWhere = buildRoomFilters({ guests, checkIn, checkOut });
+  const roomWhere = buildRoomFilters({ guests, checkIn, checkOut, minPrice, maxPrice });
  
   if (Object.keys(roomWhere).length > 0) {
     where.room = { some: roomWhere };

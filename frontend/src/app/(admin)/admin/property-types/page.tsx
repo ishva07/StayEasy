@@ -79,9 +79,7 @@ function PropertyTypeContent() {
   const openEditForm = (propertyType: PropertyType) => {
     form.reset({ name: propertyType.name, propertyTypeImage: undefined });
     setEditingPropertyType(propertyType);
-    setImagePreview(
-      propertyType.image ? `${propertyType.image}` : null
-    );
+    setImagePreview(propertyType.image ?? null);
     setFormOpen(true);
   };
 
@@ -172,38 +170,26 @@ function PropertyTypeContent() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Property Type Image</FormLabel>
-
                     {imagePreview && (
-                      <div className="mb-2 h-20 w-28 rounded-md overflow-hidden bg-muted">
-                        <img
-                          src={imagePreview}
-                          alt="Property type preview"
-                          className="h-full w-full object-cover"
-                        />
+                      <div className="mb-2 h-20 w-28 overflow-hidden rounded-md bg-muted">
+                        <img src={imagePreview} alt="Property type preview" className="h-full w-full object-cover" />
                       </div>
                     )}
-
                     <FormControl>
                       <input
                         type="file"
-                        accept="image/*"
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                          const file = e.target.files?.[0] ?? null;
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          const file = event.target.files?.[0];
                           field.onChange(file);
-                          if (file) {
-                            setImagePreview(URL.createObjectURL(file));
-                          }
+                          if (file) setImagePreview(URL.createObjectURL(file));
                         }}
                         className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
                       />
                     </FormControl>
-
                     {editingPropertyType && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Leave empty to keep the current image
-                      </p>
+                      <p className="mt-1 text-xs text-gray-500">Leave empty to keep the current image</p>
                     )}
-
                     <FormMessage />
                   </FormItem>
                 )}

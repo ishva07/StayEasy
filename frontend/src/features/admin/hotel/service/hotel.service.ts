@@ -14,7 +14,8 @@ export const hotelService = {
     formData.append("cityId", data.cityId);
     formData.append("address", data.address);
     formData.append("propertyTypeId", data.propertyTypeId);
-    if (data.isFeatured) formData.append("isFeatured", String(data.isFeatured));
+    if (data.isFeatured !== undefined)
+      formData.append("isFeatured", String(data.isFeatured));
     if (data.heroImage) {
       formData.append("heroImage", data.heroImage);
     }
