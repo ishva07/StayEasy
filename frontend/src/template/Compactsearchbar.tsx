@@ -3,11 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { getCity } from "@/features/city/hooks/useGetCity";
+import { useGetAllCity } from "@/features/city/hooks/useGetAllCity";
 
 export function CompactSearchBar() {
   const router = useRouter();
-  const { data: cities } = getCity();
+  const { data: cities } = useGetAllCity();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 

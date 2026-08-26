@@ -21,4 +21,8 @@ export const cityService = {
         const res = await api.delete(`/city/${cityId}`);
         return res.data.data;
     },
+     getCityApi : async(params: any) =>{
+        const res = await api.get("/city", { params });
+        return res.data.data;
+    },
 }

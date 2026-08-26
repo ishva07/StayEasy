@@ -4,7 +4,7 @@ import { useHotels } from "@/features/hotels/hooks/useHotels";
 import { Hero } from "@/features/client/hotels/components/Hero";
 import { TrustStrip } from "@/features/client/hotels/components/TrustStrip";
 import { FeaturedCarousel } from "@/features/client/hotels/components/FeaturedCarousel";
-import { getCity } from "@/features/city/hooks/useGetCity";
+import { useGetAllCity } from "@/features/city/hooks/useGetAllCity";
 import { useGetPropertyType } from "@/features/propertyType/hooks/usePropertyTypeOptions";
 import { CityCarousel } from "@/features/client/hotels/components/CityCarousel";
 import { PropertyTypeCarousel } from "@/features/client/hotels/components/PropertyTypeCarousel";
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 export default function HomePage() {
-  const { data: cities, isLoading: isCitiesLoading } = getCity();
+  const { data: cities, isLoading: isCitiesLoading } = useGetAllCity();
   const { data: propertyTypes, isLoading: isTypesLoading } = useGetPropertyType();
 
   const {

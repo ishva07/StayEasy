@@ -65,7 +65,7 @@ export function HotelsContent() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Hotels</h1>
-                        <p className="mt-2 text-sm text-slate-500">Manage your hotel inventory, view details, and update listings.</p>
+                        <p className="mt-2 text-sm text-slate-500">Manage hotels, view their details, and handle room assignments.</p>
                     </div>
                     {hasPermission(PERMISSIONS.ADD_HOTEL) && (
                         <Button onClick={() => router.push("/admin/hotels/new")}>Add Hotel</Button>

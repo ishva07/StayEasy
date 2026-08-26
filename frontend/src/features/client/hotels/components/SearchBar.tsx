@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getCity } from "@/features/city/hooks/useGetCity";
+import { useGetAllCity } from "@/features/city/hooks/useGetAllCity";
 
 export function SearchBar() {
   const router = useRouter();
-  const { data: cities } = getCity(); 
+  const { data: cities } = useGetAllCity(); 
 
   const [cityInput, setCityInput] = useState(""); 
   const [checkIn, setCheckIn] = useState("");

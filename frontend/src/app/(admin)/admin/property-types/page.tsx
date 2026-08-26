@@ -24,7 +24,7 @@ import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { PERMISSIONS } from "@/constants/permissions";
 import { usePermission } from "@/hooks/usePermission";
 
-import { useGetPropertyType } from "@/features/propertyType/hooks/usePropertyTypeOptions";
+import { useGetPropertyTypes } from "@/features/propertyType/hooks/usePropertyTypeOptions";
 import { useCreatePropertyType } from "@/features/admin/propertyTypes/hooks/useCreatePropertyType";
 import { useEditPropertyType } from "@/features/admin/propertyTypes/hooks/useEditPropertyType";
 import { useDeletePropertyType } from "@/features/admin/propertyTypes/hooks/useDeletePropertyType";
@@ -48,7 +48,12 @@ function PropertyTypeContent() {
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const { data, isLoading } = useGetPropertyType();
+  const { data, isLoading } = useGetPropertyTypes({
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+    sortBy: sorting[0]?.id ?? "name",
+    order: sorting[0]?.desc ? "desc" : "asc",
+  });
 
   const { deletePropertyType, isPending: isDeleting } = useDeletePropertyType();
   const [propertyTypeToDelete, setPropertyTypeToDelete] = useState<PropertyType | null>(null);
@@ -129,8 +134,8 @@ function PropertyTypeContent() {
       <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
         <DataTable
           columns={columns}
-          data={data ?? []}
-          pageCount={1}
+          data={data?.data ?? []}
+          pageCount={data?.totalPages ?? 1}
           pagination={pagination}
           onPaginationChange={setPagination}
           sorting={sorting}

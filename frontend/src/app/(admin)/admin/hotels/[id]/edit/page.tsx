@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { HotelForm } from "@/features/admin/hotel/components/HotelForm";
 import { useHotelById } from "@/features/hotels/hooks/useHotelById";
 import { useEditHotels } from "@/features/admin/hotel/hooks/useEditHotel";
@@ -78,8 +80,20 @@ export function EditHotelContent() {
     return <p className="text-sm text-muted-foreground">Hotel not found.</p>;
 
   return (
-    <div className="max-w-2xl space-y-4">
-      <h1 className="text-xl font-semibold">Edit Hotel</h1>
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Edit Hotel</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.push("/admin/hotels")}
+          className="rounded-full"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1.5" />
+          Back
+        </Button>
+        
+      </div>
       <HotelForm
         mode="edit"
         defaultValues={defaultValues}

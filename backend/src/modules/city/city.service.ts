@@ -41,7 +41,38 @@ export const deleteCityService = async (cityId: string) => {
 };
 
 
-export const getCityService = async () => {
-  const city = await prisma.city.findMany();
-  return city;
+export const getCityService = async ({
+  page = 1,
+  limit = 10,
+  sortBy = "name",
+  order = "asc",
+}: any) => {
+  const skip = (page - 1) * limit;
+
+  const allowedSortBy = ["name"] as const;
+  const allowedOrder = ["asc", "desc"] as const;
+
+  const safeSortBy = (allowedSortBy as readonly string[]).includes(sortBy)
+    ? (sortBy as (typeof allowedSortBy)[number])
+    : "name";
+  const safeOrder = (allowedOrder as readonly string[]).includes(order)
+    ? (order as (typeof allowedOrder)[number])
+    : "asc";
+
+  const [data, total] = await Promise.all([
+    prisma.city.findMany({
+      skip,
+      take: limit,
+      orderBy: { [safeSortBy]: safeOrder },
+    }),
+    prisma.city.count(),
+  ]);
+
+  return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
+};
+
+export const getAllCityService = async () => {
+  return prisma.city.findMany({
+    orderBy: { name: "asc" },
+  });
 };
