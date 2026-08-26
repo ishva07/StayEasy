@@ -58,6 +58,7 @@ export function getHotelColumns({
     {
       accessorKey: "isFeatured",
       header: "Featured",
+        enableSorting: false,
       cell: ({ row }) => (row.original.isFeatured ? "Yes" : "No"),
     },
     {

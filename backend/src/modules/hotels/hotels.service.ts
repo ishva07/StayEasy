@@ -189,25 +189,26 @@ function buildRoomFilters({
 }
  
 // ---- 3. Decides how results should be sorted ----
-function buildOrderBy(
-  sortBy: string,
-  order: string
-) {
+function buildOrderBy(sortBy: string, order: string) {
   if (sortBy === "popular") {
     return [{ reviewCount: "desc" as const }, { avgReview: "desc" as const }];
   }
- 
-  const allowedSortBy = ["name", "createdAt"] as const;
+
   const allowedOrder = ["asc", "desc"] as const;
- 
-  const safeSortBy = (allowedSortBy as readonly string[]).includes(sortBy)
-    ? (sortBy as (typeof allowedSortBy)[number])
-    : "createdAt";
   const safeOrder = (allowedOrder as readonly string[]).includes(order)
     ? (order as (typeof allowedOrder)[number])
     : "desc";
- 
-  return { [safeSortBy]: safeOrder };
+
+  switch (sortBy) {
+    case "city":
+      return { city: { name: safeOrder } };
+    case "propertyType":
+      return { propertyType: { name: safeOrder } };
+    case "name":
+      return { name: safeOrder };
+    default:
+      return { createdAt: safeOrder };
+  }
 }
  
 export const getHotelService = async ({

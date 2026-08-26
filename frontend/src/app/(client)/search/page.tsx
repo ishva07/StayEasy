@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useHotels } from "@/features/hotels/hooks/useHotels";
-import { getCity } from "@/features/city/hooks/useGetCity";
+import { useGetAllCity } from "@/features/city/hooks/useGetAllCity";
 import { useGetPropertyType } from "@/features/propertyType/hooks/usePropertyTypeOptions";
 import { useAmenityOptions } from "@/features/admin/amenities/hook/useAmenities";
 import { HotelCard } from "@/features/client/hotels/components/HotelCard";
@@ -44,7 +44,7 @@ function SearchPageContent() {
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
   });
 
-  const { data: cities } = getCity();
+  const { data: cities } = useGetAllCity();
   const { data: propertyTypes } = useGetPropertyType();
   const { data: amenitiesList } = useAmenityOptions();
 

@@ -28,7 +28,10 @@ import { getCity } from "@/features/city/hooks/useGetCity";
 import { useCreateCity } from "@/features/admin/city/hook/useCreateCity";
 import { useEditCity } from "@/features/admin/city/hook/useEditCity";
 import { useDeleteCity } from "@/features/admin/city/hook/useDeleteCity";
-import { getCityColumns, City } from "@/features/admin/city/components/city-column";
+import {
+  getCityColumns,
+  City,
+} from "@/features/admin/city/components/city-column";
 import {
   createCitySchema,
   updateCitySchema,
@@ -45,8 +48,15 @@ function CityContent() {
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const { data, isLoading } = getCity();
+  const sortBy = sorting[0]?.id ?? "name";
+  const order = sorting[0]?.desc ? "desc" : "asc";
 
+  const { data, isLoading } = getCity({
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+    sortBy,
+    order,
+  });
   const { deleteCity, isPending: isDeleting } = useDeleteCity();
   const [cityToDelete, setCityToDelete] = useState<City | null>(null);
 
@@ -76,16 +86,18 @@ function CityContent() {
   const openEditForm = (city: City) => {
     form.reset({ name: city.name, cityImage: undefined });
     setEditingCity(city);
-    setImagePreview(
-      city.images ? `${city.images}` : null
-    );
+    setImagePreview(city.images ? `${city.images}` : null);
     setFormOpen(true);
   };
 
   const handleFormSubmit = (formData: updateCityFormInput) => {
     if (editingCity) {
       editCity(
-        { cityId: editingCity.id, name: formData.name, cityImage: formData.cityImage },
+        {
+          cityId: editingCity.id,
+          name: formData.name,
+          cityImage: formData.cityImage,
+        },
         { onSuccess: () => setFormOpen(false) },
       );
     } else {
@@ -114,8 +126,13 @@ function CityContent() {
       <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Cities</h1>
-            <p className="mt-2 text-sm text-slate-500">Manage your cities, upload city images, and keep destinations up to date.</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
+              Cities
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Manage your cities, upload city images, and keep destinations up
+              to date.
+            </p>
           </div>
           {canAdd && <Button onClick={openCreateForm}>Add City</Button>}
         </div>
@@ -124,8 +141,8 @@ function CityContent() {
       <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
         <DataTable
           columns={columns}
-          data={data ?? []}
-          pageCount={1}
+          data={data?.data ?? []}
+          pageCount={data?.totalPages ?? 0}
           pagination={pagination}
           onPaginationChange={setPagination}
           sorting={sorting}
