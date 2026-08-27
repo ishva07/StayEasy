@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, Menu, X, Building2, User, CalendarCheck, ChevronDown } from "lucide-react";
+import {
+  LogOut,
+  Menu,
+  X,
+  Building2,
+  User,
+  CalendarCheck,
+  ChevronDown,
+} from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -51,33 +59,32 @@ export function SiteLayout({
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <header className="h-16 sticky top-0 z-50 border-b border-border/60 bg-card/95 backdrop-blur-md shadow-sm">
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 md:px-6">
+<header className="h-16 sticky top-0 z-50 border-b border-white/10 bg-background/85 backdrop-blur-xl shadow-sm">
+           <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 md:px-6">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-              <Building2 className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="font-display text-xl font-semibold tracking-tight">
-              {appName}
-            </span>
+            <img
+              src="/brand/logo-icon.svg"
+              alt={appName}
+              className="h-64 w-64 "
+            />
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-9">
             {navItems.map(({ label, href }) => (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "relative py-2 text-sm font-medium transition-colors",
+                  "relative py-2 text-[15px] font-semibold tracking-tight transition-colors",
                   pathname === href
                     ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                    : "text-slate-500 hover:text-foreground",
                 )}
               >
                 {label}
                 {pathname === href && (
-                  <span className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-primary rounded-full" />
+                  <span className="absolute -bottom-[1px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#e5be56] to-[#a0751a] rounded-full" />
                 )}
               </Link>
             ))}
@@ -95,7 +102,7 @@ export function SiteLayout({
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium max-w-[100px] truncate">
-                    {user.name ? `Account`: ""}
+                    {user.name ? `Account` : ""}
                   </span>
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                 </DropdownMenuTrigger>
@@ -174,7 +181,9 @@ export function SiteLayout({
           </button>
         </div>
 
-        <div className={`md:hidden border-t border-border/60 px-4 py-3 space-y-1 bg-background/95 backdrop-blur-md transition-all duration-200 ease-out overflow-hidden ${mobileOpen ? 'max-h-screen' : 'max-h-0'}`}>
+        <div
+          className={`md:hidden border-t border-border/60 px-4 py-3 space-y-1 bg-background/95 backdrop-blur-md transition-all duration-200 ease-out overflow-hidden ${mobileOpen ? "max-h-screen" : "max-h-0"}`}
+        >
           {showCompactSearch && (
             <div className="pb-3 mb-2 border-b border-border/60">
               <CompactSearchBar />
@@ -200,10 +209,16 @@ export function SiteLayout({
           <div className="pt-2 border-t border-border/60 mt-2">
             {user ? (
               <>
-                <Link href="/my-bookings" className="flex items-center gap-2 px-3 py-2 text-sm">
+                <Link
+                  href="/my-bookings"
+                  className="flex items-center gap-2 px-3 py-2 text-sm"
+                >
                   <CalendarCheck className="h-4 w-4" /> My Bookings
                 </Link>
-                <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm">
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 px-3 py-2 text-sm"
+                >
                   <User className="h-4 w-4" /> Profile
                 </Link>
                 <button

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 280" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold-brand" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3cd"/>
+      <stop offset="25%" stop-color="#e5be56"/>
+      <stop offset="50%" stop-color="#c9963a"/>
+      <stop offset="75%" stop-color="#f5da8b"/>
+      <stop offset="100%" stop-color="#a0751a"/>
+    </linearGradient>
+
+    <linearGradient id="emerald-brand" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#25a37e"/>
+      <stop offset="40%" stop-color="#197e61"/>
+      <stop offset="80%" stop-color="#105742"/>
+      <stop offset="100%" stop-color="#0a392b"/>
+    </linearGradient>
+
+    <linearGradient id="gem-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff3d1"/>
+      <stop offset="50%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#996e0f"/>
+    </linearGradient>
+
+    <linearGradient id="em-c-top" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#146b52"/>
+      <stop offset="100%" stop-color="#0a392b"/>
+    </linearGradient>
+    <linearGradient id="em-c-bot" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#1e9170"/>
+      <stop offset="60%" stop-color="#105742"/>
+      <stop offset="100%" stop-color="#05261d"/>
+    </linearGradient>
+    <linearGradient id="em-l-out" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e4d3b"/>
+      <stop offset="100%" stop-color="#041e16"/>
+    </linearGradient>
+    <linearGradient id="em-r-out" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0e4d3b"/>
+      <stop offset="100%" stop-color="#041e16"/>
+    </linearGradient>
+    <linearGradient id="em-mid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#187d60"/>
+      <stop offset="100%" stop-color="#0a3b2d"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(40, 20) scale(0.55)">
+    <polygon points="200,390 40,165 95,85 305,85 360,165" fill="none" stroke="url(#gold-brand)" stroke-width="12" stroke-linejoin="round"/>
+
+    <polygon points="200,165 145,85 255,85" fill="url(#em-c-top)" stroke="url(#gold-brand)" stroke-width="5" stroke-linejoin="round"/>
+    <polygon points="95,85 145,85 120,165" fill="url(#em-l-out)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="95,85 40,165 120,165" fill="url(#em-mid)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="305,85 255,85 280,165" fill="url(#em-r-out)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="305,85 360,165 280,165" fill="url(#em-mid)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="145,85 200,165 120,165" fill="url(#em-mid)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="255,85 200,165 280,165" fill="url(#em-mid)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <polygon points="200,165 150,255 200,380 250,255" fill="url(#em-c-bot)" stroke="url(#gold-brand)" stroke-width="5.5" stroke-linejoin="round"/>
+    <polygon points="120,165 200,165 150,255" fill="url(#em-mid)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="280,165 200,165 250,255" fill="url(#em-mid)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="120,165 150,255 200,380" fill="url(#em-l-out)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="280,165 250,255 200,380" fill="url(#em-r-out)" stroke="url(#gold-brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <polygon points="40,165 120,165 200,380" fill="url(#em-l-out)" stroke="url(#gold-brand)" stroke-width="5.5" stroke-linejoin="round"/>
+    <polygon points="360,165 280,165 200,380" fill="url(#em-r-out)" stroke="url(#gold-brand)" stroke-width="5.5" stroke-linejoin="round"/>
+
+    <line x1="40" y1="165" x2="360" y2="165" stroke="url(#gem-gold)" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(290, 160)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, 'SF Pro Display', 'Montserrat', 'Inter', 'Segoe UI', sans-serif" font-weight="900" font-size="108" letter-spacing="2">
+      <tspan fill="url(#gold-brand)">STAY</tspan><tspan fill="url(#emerald-brand)">EASY</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(295, 212)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, 'SF Pro Text', 'Montserrat', 'Inter', 'Segoe UI', sans-serif" font-weight="700" font-size="22" letter-spacing="9" fill="url(#gold-brand)" opacity="0.92">
+      PREMIUM BOUTIQUE HOTELS
+    </text>
+  </g>
+</svg>
