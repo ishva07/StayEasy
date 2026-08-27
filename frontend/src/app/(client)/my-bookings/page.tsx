@@ -23,7 +23,6 @@ import {
   Star,
 } from "lucide-react";
 
-
 const STATUS_CONFIG: Record<
   string,
   {
@@ -41,7 +40,6 @@ const STATUS_CONFIG: Record<
     bgColor: "bg-amber-50",
     icon: Clock3,
   },
-
   CONFIRMED: {
     text: "Confirmed",
     dot: "bg-emerald-500",
@@ -49,7 +47,6 @@ const STATUS_CONFIG: Record<
     bgColor: "bg-emerald-50",
     icon: CheckCircle2,
   },
-
   CHECKIN: {
     text: "Checked in",
     dot: "bg-blue-500",
@@ -57,7 +54,6 @@ const STATUS_CONFIG: Record<
     bgColor: "bg-blue-50",
     icon: LogIn,
   },
-
   CHECKOUT: {
     text: "Completed",
     dot: "bg-slate-500",
@@ -65,7 +61,6 @@ const STATUS_CONFIG: Record<
     bgColor: "bg-slate-50",
     icon: LogOut,
   },
-
   CANCELED: {
     text: "Cancelled",
     dot: "bg-red-500",
@@ -83,8 +78,6 @@ function formatDate(date: string) {
   });
 }
 
-
-
 function BookingCard({
   booking,
   onCancel,
@@ -96,12 +89,9 @@ function BookingCard({
   onReview: (booking: any) => void;
   onViewHotel: (booking: any) => void;
 }) {
-  const status =
-    STATUS_CONFIG[booking.status] ?? STATUS_CONFIG.PENDING;
+  const status = STATUS_CONFIG[booking.status] ?? STATUS_CONFIG.PENDING;
 
-  const imageUrl = booking.room?.roomImage
-    ? `${booking.room.roomImage}`
-    : "";
+  const imageUrl = booking.room?.roomImage ? `${booking.room.roomImage}` : "";
 
   const isCompleted = booking.status === "CHECKOUT";
   const isPending = booking.status === "PENDING";
@@ -110,6 +100,8 @@ function BookingCard({
   return (
     <article
       className="
+        relative
+        min-h-[123px]
         overflow-hidden
         rounded-xl
         border
@@ -120,17 +112,18 @@ function BookingCard({
         duration-200
         hover:border-[#c8c2b7]
         hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]
+        hover:shadow-lg
+        transition-shadow
       "
     >
-      
-      <div className="p-2.5">
-        <div className="flex items-center gap-3">
+      <div className="p-4">
+        <div className="flex items-center gap-3 h-full">
           <div
             className="
-              h-[68px]
-              w-[76px]
-              shrink-0
-              overflow-hidden
+              w-1/3
+                h-full
+                shrink-0
+                overflow-hidden
               rounded-lg
               bg-[#eeeae3]
             "
@@ -148,9 +141,7 @@ function BookingCard({
             )}
           </div>
 
-          {/* Information */}
           <div className="min-w-0 flex-1">
-            {/* Hotel name + status */}
             <div className="flex items-center gap-2">
               <h2
                 className="
@@ -166,36 +157,12 @@ function BookingCard({
                 {booking.room?.hotel?.name ?? "Hotel"}
               </h2>
 
-              {/* Status */}
-              <span
-                className={`
-                  inline-flex
-                  shrink-0
-                  items-center
-                  gap-1.5
-                  rounded-full
-                  px-2
-                  py-[3px]
-                  text-[11px]
-                  font-medium
-                  ${status.bgColor}
-                  ${status.textColor}
-                `}
-              >
-                <span
-                  className={`
-                    h-1.5
-                    w-1.5
-                    rounded-full
-                    ${status.dot}
-                  `}
-                />
-
-                {status.text}
-              </span>
+              <div className={`absolute top-2 right-2 flex items-center gap-1.5 rounded-full px-2 py-[3px] text-[11px] font-medium ${status.bgColor} ${status.textColor}`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`}></span>
+                  {status.text}
+                </div>
             </div>
 
-            {/* Booking metadata */}
             <div
               className="
                 mt-2
@@ -216,11 +183,9 @@ function BookingCard({
                 </span>
               )}
 
-              <span className="inline-flex items-center gap-1">
-                <CalendarDays className="h-3.5 w-3.5 text-[#777168]" />
-                {formatDate(booking.checkIn)} –{" "}
-                {formatDate(booking.checkOut)}
-              </span>
+              <p className="text-[20px] font-bold text-[#191814] mt-1">
+                  {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}
+                </p>
 
               {booking.room?.capacity && (
                 <span className="inline-flex items-center gap-1">
@@ -243,11 +208,10 @@ function BookingCard({
           border-t
           border-[#e5e1d9]
           bg-[#faf9f6]
-          px-2.5
-          py-1.5
+          px-4
+          py-2
         "
       >
-        {/* Price / booking date */}
         <div className="flex items-center">
           {booking.totalPrice ? (
             <p
@@ -275,7 +239,6 @@ function BookingCard({
             </p>
           )}
 
-          {/* Cancel */}
           {isPending && (
             <button
               type="button"
@@ -331,15 +294,16 @@ function BookingCard({
             size="sm"
             onClick={() => onViewHotel(booking)}
             className="
-              h-7
+              h-8
               rounded-full
               bg-[#14513e]
-              px-3.5
-              text-[11px]
+              hover:bg-[#0f4233]
+              px-4
+              text-[12px]
               font-medium
               text-white
-              shadow-none
-              hover:bg-[#0f4233]
+              shadow-md
+              transition-colors
             "
           >
             View hotel
@@ -350,22 +314,17 @@ function BookingCard({
   );
 }
 
-
 function MyBookingsContent() {
   const router = useRouter();
 
   const { data, isLoading } = useMyBookings();
 
-  const {
-    cancelBooking,
-    isPending: isCancelling,
-  } = useCancelBooking();
+  const { cancelBooking, isPending: isCancelling } = useCancelBooking();
 
   const [bookingToCancel, setBookingToCancel] = useState<any>(null);
   const [bookingToReview, setBookingToReview] = useState<any>(null);
 
   const bookings = data?.data ?? [];
-
 
   const handleConfirmCancel = () => {
     if (!bookingToCancel) return;
@@ -377,19 +336,17 @@ function MyBookingsContent() {
     });
   };
 
-
   if (isLoading) {
     return (
       <main className="min-h-screen bg-[#fdfcf9]">
-        <div className="mx-auto w-full max-w-[510px] px-4 py-12">
-          {/* Header skeleton */}
+        <div className="mx-auto w-full max-w-[510px] lg:max-w-5xl px-4 py-12">
           <div className="mb-7 space-y-2">
             <div className="h-9 w-48 animate-pulse rounded-md bg-[#ebe8e1]" />
             <div className="h-4 w-72 animate-pulse rounded-md bg-[#ebe8e1]" />
           </div>
 
-          <div className="space-y-3">
-            {[1, 2, 3].map((item) => (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((item) => (
               <div
                 key={item}
                 className="
@@ -408,16 +365,15 @@ function MyBookingsContent() {
     );
   }
 
-
   return (
     <main className="min-h-screen bg-[#fdfcf9]">
-      <div className="mx-auto w-full max-w-[510px] px-4 pb-12 pt-8 sm:pt-12">
-
-        <header className="mb-7">
+      <div className="mx-auto w-full max-w-[510px] lg:max-w-5xl px-4 pb-12 pt-8 sm:pt-12">
+        <header className="mb-8 lg:mb-10">
           <h1
             className="
               font-display
               text-[32px]
+              lg:text-[40px]
               font-medium
               leading-[1.05]
               tracking-[-0.02em]
@@ -430,6 +386,8 @@ function MyBookingsContent() {
           <p className="mt-2 text-[14px] text-[#68645d]">
             Manage your upcoming and past reservations.
           </p>
+
+          <div className="mt-6 h-px w-full bg-[#e5e1d9] hidden lg:block" />
         </header>
 
         {bookings.length === 0 ? (
@@ -465,8 +423,8 @@ function MyBookingsContent() {
             </h2>
 
             <p className="mx-auto mt-1 max-w-xs text-[13px] leading-5 text-[#777168]">
-              When you book a stay, it&apos;ll show up here with all
-              your reservation details.
+              When you book a stay, it&apos;ll show up here with all your
+              reservation details.
             </p>
 
             <Button
@@ -487,7 +445,7 @@ function MyBookingsContent() {
             </Button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {bookings.map((booking: any) => (
               <BookingCard
                 key={booking.id}
@@ -495,15 +453,12 @@ function MyBookingsContent() {
                 onCancel={setBookingToCancel}
                 onReview={setBookingToReview}
                 onViewHotel={(currentBooking) =>
-                  router.push(
-                    `/hotels/${currentBooking.room?.hotelId}`
-                  )
+                  router.push(`/hotels/${currentBooking.room?.hotelId}`)
                 }
               />
             ))}
           </div>
         )}
-
 
         <ConfirmDialog
           open={!!bookingToCancel}
@@ -518,13 +473,10 @@ function MyBookingsContent() {
           onConfirm={handleConfirmCancel}
         />
 
-
         {bookingToReview && (
           <ReviewFormModal
             bookingId={bookingToReview.id}
-            hotelName={
-              bookingToReview.room?.hotel?.name ?? "this stay"
-            }
+            hotelName={bookingToReview.room?.hotel?.name ?? "this stay"}
             onClose={() => setBookingToReview(null)}
           />
         )}
@@ -533,12 +485,9 @@ function MyBookingsContent() {
   );
 }
 
-
 export default function MyBookingsPage() {
   return (
-    <ProtectedRoute
-      requiredPermission={PERMISSIONS.VIEW_MY_BOOKING}
-    >
+    <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_MY_BOOKING}>
       <MyBookingsContent />
     </ProtectedRoute>
   );

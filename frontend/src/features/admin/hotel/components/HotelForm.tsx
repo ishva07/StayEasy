@@ -177,7 +177,7 @@ export function HotelForm({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="propertyTypeId"
@@ -244,7 +244,7 @@ export function HotelForm({
 
         {/* ---- Location ---- */}
         <SectionCard icon={MapPin} title="Location" subtitle="Where guests will find this property">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="cityId"

@@ -7,11 +7,19 @@ import { useGetPropertyType } from "@/features/propertyType/hooks/usePropertyTyp
 import { useAmenityOptions } from "@/features/admin/amenities/hook/useAmenities";
 import { HotelCard } from "@/features/client/hotels/components/HotelCard";
 import { FilterSidebar } from "@/features/client/hotels/components/FilterSidebar";
-import { Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { Button } from "@/components/ui/button";
+import { SlidersHorizontal, X } from "lucide-react";
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const checkIn = searchParams.get("checkIn") ?? undefined;
   const checkOut = searchParams.get("checkOut") ?? undefined;
@@ -28,6 +36,15 @@ function SearchPageContent() {
   const page = Number(searchParams.get("page") ?? 1);
   const minPrice = searchParams.get("minPrice") ?? undefined;
   const maxPrice = searchParams.get("maxPrice") ?? undefined;
+
+  // Calculate active filter count
+  let activeFilterCount = 0;
+  if (city) activeFilterCount++;
+  if (propertyType) activeFilterCount++;
+  if (amenityIds.length > 0) activeFilterCount += amenityIds.length;
+  if (search) activeFilterCount++;
+  if (minRating) activeFilterCount++;
+  if (minPrice || maxPrice) activeFilterCount++;
 
   const { data: hotelsData, isLoading } = useHotels({
     page,
@@ -63,6 +80,19 @@ function SearchPageContent() {
     router.push(`/search?${params.toString()}`);
   };
 
+  const clearAllFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("city");
+    params.delete("propertyType");
+    params.delete("amenityIds");
+    params.delete("search");
+    params.delete("minRating");
+    params.delete("minPrice");
+    params.delete("maxPrice");
+    params.set("page", "1");
+    router.push(`/search?${params.toString()}`);
+  };
+
   const goToPage = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(newPage));
@@ -75,36 +105,139 @@ function SearchPageContent() {
   )?.name;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="font-display text-2xl font-bold mb-2">
-        {cityName
-          ? `Hotels in ${cityName}`
-          : propertyTypeName
-            ? `${propertyTypeName}s`
-            : "All stays"}
-      </h1>
-      <p className="text-sm text-muted-foreground mb-8">
-        {hotelsData?.total ?? 0} properties found
-      </p>
+    <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <h1 className="font-display text-2xl font-bold mb-1 sm:mb-2">
+            {!mounted
+              ? "All stays"
+              : cityName
+                ? `Hotels in ${cityName}`
+                : propertyTypeName
+                  ? `${propertyTypeName}s`
+                  : "All stays"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {mounted && hotelsData
+              ? `${hotelsData.total} properties found`
+              : "Loading properties..."}
+          </p>
+        </div>
+
+        {/* Mobile Filter Button Bar (visible below lg) */}
+        {mounted && (
+          <div className="lg:hidden">
+            <Button
+              variant="outline"
+              onClick={() => setMobileFiltersOpen(true)}
+              className="flex items-center gap-2 rounded-full border-border/80 h-10 px-4 text-xs font-semibold"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-primary" />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Bottom Sheet / Modal for Filters */}
+      {mounted && mobileFiltersOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs lg:hidden">
+          <div
+            className="fixed inset-0"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+          <div className="relative z-10 flex flex-col w-full sm:max-w-lg max-h-[90vh] rounded-t-3xl sm:rounded-3xl bg-background shadow-2xl overflow-hidden border border-border/60">
+            {/* Header with Drag Handle & Close */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4 text-primary" />
+                <h2 className="font-display text-lg font-bold">Filters</h2>
+                {activeFilterCount > 0 && (
+                  <span className="flex h-5 px-2 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                    {activeFilterCount} active
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
+                aria-label="Close filters"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Filter Body */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <FilterSidebar
+                cities={cities}
+                propertyTypes={propertyTypes}
+                amenitiesList={amenitiesList}
+                selectedCity={city}
+                selectedPropertyType={propertyType}
+                selectedAmenities={amenityIds}
+                selectedSearch={search}
+                selectedMinRating={minRating}
+                onChange={updateFilters}
+                selectedMinPrice={minPrice}
+                selectedMaxPrice={maxPrice}
+              />
+            </div>
+
+            {/* Sticky Bottom Actions */}
+            <div className="flex items-center gap-3 p-4 border-t border-border/60 bg-background/95 backdrop-blur-sm">
+              <Button
+                variant="outline"
+                onClick={clearAllFilters}
+                className="flex-1 rounded-full h-11 text-xs font-semibold"
+                disabled={activeFilterCount === 0}
+              >
+                Clear all
+              </Button>
+              <Button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="flex-1 rounded-full h-11 text-xs font-semibold bg-primary text-primary-foreground"
+              >
+                Apply filters
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
-        <FilterSidebar
-          cities={cities}
-          propertyTypes={propertyTypes}
-          amenitiesList={amenitiesList}
-          selectedCity={city}
-          selectedPropertyType={propertyType}
-          selectedAmenities={amenityIds}
-          selectedSearch={search}
-          selectedMinRating={minRating}
-          onChange={updateFilters}
-          selectedMinPrice={minPrice}
-          selectedMaxPrice={maxPrice}
-        />
+        {/* Desktop Sidebar (hidden on mobile) */}
+        <div className="hidden lg:block">
+          {mounted ? (
+            <FilterSidebar
+              cities={cities}
+              propertyTypes={propertyTypes}
+              amenitiesList={amenitiesList}
+              selectedCity={city}
+              selectedPropertyType={propertyType}
+              selectedAmenities={amenityIds}
+              selectedSearch={search}
+              selectedMinRating={minRating}
+              onChange={updateFilters}
+              selectedMinPrice={minPrice}
+              selectedMaxPrice={maxPrice}
+            />
+          ) : (
+            <div className="space-y-6 animate-pulse p-4">
+              <div className="h-8 w-24 bg-muted rounded" />
+              <div className="h-32 bg-muted rounded" />
+            </div>
+          )}
+        </div>
 
         <div>
-          {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+          {isLoading || !mounted ? (
+            <p className="text-sm text-muted-foreground">Loading stays...</p>
           ) : hotelsData?.data?.length ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">

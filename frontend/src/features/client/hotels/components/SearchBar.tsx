@@ -40,11 +40,11 @@ export function SearchBar() {
   return (
     <form
       onSubmit={handleSearch}
-      className="flex flex-col sm:flex-row items-stretch max-w-3xl mx-auto
+      className="grid grid-cols-2 sm:flex sm:flex-row items-stretch max-w-3xl mx-auto
                  bg-background/90 backdrop-blur-xl rounded-2xl sm:rounded-full
                  shadow-2xl shadow-black/20 border border-white/40 overflow-hidden"
     >
-      <div className="flex-1 px-6 py-4 sm:border-r border-border/60">
+      <div className="col-span-2 sm:flex-1 px-6 py-3 sm:py-4 border-b sm:border-b-0 sm:border-r border-border/60">
         <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
           Destination
         </label>
@@ -62,7 +62,7 @@ export function SearchBar() {
         </datalist>
       </div>
 
-      <div className="flex-1 px-6 py-4 sm:border-r border-border/60">
+      <div className="col-span-1 sm:flex-1 px-6 py-3 sm:py-4 border-b border-r sm:border-b-0 sm:border-r border-border/60">
         <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
           Check-In
         </label>
@@ -75,7 +75,7 @@ export function SearchBar() {
         />
       </div>
 
-      <div className="flex-1 px-6 py-4 sm:border-r border-border/60">
+      <div className="col-span-1 sm:flex-1 px-6 py-3 sm:py-4 border-b sm:border-b-0 sm:border-r border-border/60">
         <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
           Check-out
         </label>
@@ -88,7 +88,7 @@ export function SearchBar() {
         />
       </div>
 
-      <div className="flex-1 px-6 py-4">
+      <div className="col-span-1 sm:flex-1 px-6 py-3 sm:py-4 border-r sm:border-r-0 border-border/60">
         <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
           Guests
         </label>
@@ -101,7 +101,7 @@ export function SearchBar() {
         />
       </div>
 
-      <div className="p-2 flex items-center">
+      <div className="col-span-1 sm:flex-none p-2 flex items-center justify-center">
         <Button type="submit" size="icon" className="rounded-full h-12 w-12 shrink-0">
           <Search className="h-4 w-4" />
         </Button>

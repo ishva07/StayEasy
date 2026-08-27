@@ -174,53 +174,52 @@ export function SiteLayout({
           </button>
         </div>
 
-        {mobileOpen && (
-          <div className="md:hidden border-t border-border/60 px-4 py-3 space-y-1 bg-background/95 backdrop-blur-md">
-            {showCompactSearch && (
-              <div className="pb-3 mb-2 border-b border-border/60">
-                <CompactSearchBar />
-              </div>
-            )}
-
-            {navItems.map(({ label, href }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "block px-3 py-2 rounded-lg text-sm font-medium",
-                  pathname === href
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-muted",
-                )}
-              >
-                {label}
-              </Link>
-            ))}
-            <div className="pt-2 border-t border-border/60 mt-2">
-              {user ? (
-                <>
-                  <Link href="/my-bookings" className="flex items-center gap-2 px-3 py-2 text-sm">
-                    <CalendarCheck className="h-4 w-4" /> My Bookings
-                  </Link>
-                  <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm">
-                    <User className="h-4 w-4" /> Profile
-                  </Link>
-                  <button
-                    onClick={() => onLogout?.()}
-                    className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-600"
-                  >
-                    <LogOut className="h-4 w-4" /> Logout
-                  </button>
-                </>
-              ) : (
-                <Link href="/login" className="block px-3 py-2 text-sm">
-                  Login
-                </Link>
-              )}
+        <div className={`md:hidden border-t border-border/60 px-4 py-3 space-y-1 bg-background/95 backdrop-blur-md transition-all duration-200 ease-out overflow-hidden ${mobileOpen ? 'max-h-screen' : 'max-h-0'}`}>
+          {showCompactSearch && (
+            <div className="pb-3 mb-2 border-b border-border/60">
+              <CompactSearchBar />
             </div>
+          )}
+
+          {navItems.map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "block px-3 py-2 rounded-lg text-sm font-medium",
+                pathname === href
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground hover:bg-muted",
+              )}
+            >
+              {label}
+            </Link>
+          ))}
+
+          <div className="pt-2 border-t border-border/60 mt-2">
+            {user ? (
+              <>
+                <Link href="/my-bookings" className="flex items-center gap-2 px-3 py-2 text-sm">
+                  <CalendarCheck className="h-4 w-4" /> My Bookings
+                </Link>
+                <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm">
+                  <User className="h-4 w-4" /> Profile
+                </Link>
+                <button
+                  onClick={() => onLogout?.()}
+                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-600 focus:text-red-600"
+                >
+                  <LogOut className="h-4 w-4" /> Logout
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="block px-3 py-2 text-sm">
+                Login
+              </Link>
+            )}
           </div>
-        )}
+        </div>
       </header>
 
       {/* Page content */}

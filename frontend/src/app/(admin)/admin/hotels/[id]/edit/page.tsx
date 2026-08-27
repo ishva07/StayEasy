@@ -81,19 +81,23 @@ export function EditHotelContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Edit Hotel</h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.push("/admin/hotels")}
-          className="rounded-full"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1.5" />
-          Back
-        </Button>
-        
-      </div>
+      <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Edit Hotel</h1>
+            <p className="mt-2 text-sm text-slate-500">Update details and media for {hotel.name}.</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push("/admin/hotels")}
+            className="rounded-full"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1.5" />
+            Back
+          </Button>
+        </div>
+      </section>
       <HotelForm
         mode="edit"
         defaultValues={defaultValues}
