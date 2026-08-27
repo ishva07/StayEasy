@@ -130,26 +130,40 @@ function RoomsContent() {
   });
 
   return (
-    <div className="space-y-4">
-      <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/hotels`)}>
-        <ArrowLeft className="h-4 w-4 mr-1" /> Back to Hotel
-      </Button>
+    <div className="space-y-6">
+      <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Rooms</h1>
+            <p className="mt-2 text-sm text-slate-500">Manage room types, pricing, and capacity for this hotel.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push("/admin/hotels")}
+              className="rounded-full"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1.5" />
+              Back
+            </Button>
+            {canAdd && <Button onClick={openCreateForm}>Add Room</Button>}
+          </div>
+        </div>
+      </section>
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Rooms</h1>
-        {canAdd && <Button onClick={openCreateForm}>Add Room</Button>}
-      </div>
-
-      <DataTable
-        columns={columns}
-        data={data?.data ?? []}
-        pageCount={data?.totalPages ?? 0}
-        pagination={pagination}
-        onPaginationChange={setPagination}
-        sorting={sorting}
-        onSortingChange={setSorting}
-        isLoading={isLoading}
-      />
+      <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
+        <DataTable
+          columns={columns}
+          data={data?.data ?? []}
+          pageCount={data?.totalPages ?? 0}
+          pagination={pagination}
+          onPaginationChange={setPagination}
+          sorting={sorting}
+          onSortingChange={setSorting}
+          isLoading={isLoading}
+        />
+      </section>
 
       {(canAdd || canEdit) && (
         <FormModal

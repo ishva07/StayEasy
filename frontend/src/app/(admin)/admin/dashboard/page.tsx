@@ -136,36 +136,38 @@ export function DashboardContent() {
             <h3 className="text-sm font-semibold text-slate-900">Recent Bookings</h3>
             <span className="text-xs text-slate-500">Most recent entries</span>
           </div>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-500 border-b border-slate-200">
-                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Hotel</th>
-                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Room</th>
-                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Check In</th>
-                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Check Out</th>
-                <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentBookings.map((booking: any) => (
-                <tr key={booking.id} className="border-b border-gray-50">
-                  <td className="py-2 text-xs">{booking.room?.hotel?.name ?? "-"}</td>
-                  <td className="py-2 text-xs">{booking.room?.name ?? "-"}</td>
-                  <td className="py-2 text-xs">{new Date(booking.checkIn).toLocaleDateString()}</td>
-                  <td className="py-2 text-xs">{new Date(booking.checkOut).toLocaleDateString()}</td>
-                  <td className="py-2">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                        STATUS_BADGE[booking.status] ?? "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
+              <thead>
+                <tr className="text-left text-slate-500 border-b border-slate-200">
+                  <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Hotel</th>
+                  <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Room</th>
+                  <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Check In</th>
+                  <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Check Out</th>
+                  <th className="py-3 font-semibold text-[11px] uppercase tracking-[0.15em]">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentBookings.map((booking: any) => (
+                  <tr key={booking.id} className="border-b border-gray-50">
+                    <td className="py-2 text-xs">{booking.room?.hotel?.name ?? "-"}</td>
+                    <td className="py-2 text-xs">{booking.room?.name ?? "-"}</td>
+                    <td className="py-2 text-xs">{new Date(booking.checkIn).toLocaleDateString()}</td>
+                    <td className="py-2 text-xs">{new Date(booking.checkOut).toLocaleDateString()}</td>
+                    <td className="py-2">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                          STATUS_BADGE[booking.status] ?? "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 p-5 overflow-y-auto shadow-sm">

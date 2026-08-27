@@ -17,7 +17,7 @@ export function Hero() {
   <div className="absolute bottom-0 left-0 right-0 h-32 sm:h-40 bg-gradient-to-b from-transparent to-background" />
       </div>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pb-24 sm:pb-28 text-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pb-44 sm:pb-28 text-center">
         <p className="text-xs sm:text-sm font-medium tracking-[0.3em] uppercase text-secondary mb-4">
           Curated Collections
         </p>
