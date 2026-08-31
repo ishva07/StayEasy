@@ -7,6 +7,7 @@ interface UseHotelsParams {
   sortBy?: string;
   order?: string;
   search?: string;
+  keyword?: string;          
   featured?: boolean;
   amenityIds?: string[];
   city?: string;
@@ -25,6 +26,7 @@ export function useHotels({
   sortBy = "createdAt",
   order = "desc",
   search = "",
+  keyword = "",           
   featured,
   amenityIds,
   city,
@@ -45,6 +47,7 @@ export function useHotels({
         sortBy,
         order,
         search,
+        keyword,         
         featured,
         amenityIds,
         city,
@@ -65,6 +68,7 @@ export function useHotels({
         sortBy,
         order,
         search,
+        keyword,          
         featured,
         amenityIds,
         city,

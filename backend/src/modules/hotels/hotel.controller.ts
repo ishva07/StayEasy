@@ -17,32 +17,32 @@ export const createHotelController = asyncHandler(async (req: Request, res: Resp
     : [];
 
   const newHotel = await createHotelsService({
-    name, description, cityId, address, isFeatured, heroImage, amenitiesIds, imageGallery,propertyTypeId
+    name, description, cityId, address, isFeatured, heroImage, amenitiesIds, imageGallery, propertyTypeId
   });
 
   res.status(201).json(new ApiResponse(true, "hotel created successfully", newHotel));
 });
 
-export const editHotelController = asyncHandler(async(req:Request,res:Response)=>{
-    const id = req.params.id.toString();
-    const {name,description,cityId,address,isFeatured, propertyTypeId} = req.body;
-    const heroImage = req.file? req.file.path : undefined;
+export const editHotelController = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.params.id.toString();
+  const {name,description,cityId,address, isFeatured, propertyTypeId } = req.body;
+  const heroImage = req.file ? req.file.path : undefined;
 
-    const updatedHotel = await editHotelsService(id,{name,description,cityId,address,isFeatured,heroImage,propertyTypeId})
-    res.status(200).json(new ApiResponse(true,"hotel updated successfully",updatedHotel));
+  const updatedHotel = await editHotelsService(id, { name, description, cityId, address, isFeatured, heroImage, propertyTypeId })
+  res.status(200).json(new ApiResponse(true, "hotel updated successfully", updatedHotel));
 })
 
-export const deletedHotelController = asyncHandler(async(req:Request,res:Response)=>{
-        const id = req.params.id.toString();
-    const deletedHotel = await deleteHotelService(id)
-    res.status(200).json(new ApiResponse(true,"hotel deleted successfully",deletedHotel));
+export const deletedHotelController = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.params.id.toString();
+  const deletedHotel = await deleteHotelService(id)
+  res.status(200).json(new ApiResponse(true, "hotel deleted successfully", deletedHotel));
 
 })
 
-export const getHotelByIdController = asyncHandler(async(req:Request,res:Response)=>{
-        const id = req.params.id.toString();    
-    const getHotelById = await getHotelsByIdService(id)
-    res.status(200).json(new ApiResponse(true,"Hotel fetched successfully.",getHotelById))
+export const getHotelByIdController = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.params.id.toString();
+  const getHotelById = await getHotelsByIdService(id)
+  res.status(200).json(new ApiResponse(true, "Hotel fetched successfully.", getHotelById))
 })
 
 export const getHotelController = asyncHandler(async (req: Request, res: Response) => {

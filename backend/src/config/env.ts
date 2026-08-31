@@ -9,6 +9,7 @@ const envSchema = z.object({
     CLOUDINARY_CLOUD_NAME: z.string(),
     CLOUDINARY_API_KEY: z.string(),
     CLOUDINARY_API_SECRET: z.string(),
+    GEMINI_API_KEY: z.string().min(1),
 })
 
 const env = envSchema.parse(process.env);

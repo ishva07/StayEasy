@@ -8,6 +8,7 @@ getHotelService: async ({
   sortBy = "createdAt",
   order = "desc",
   search = "",
+  keyword = "",           
   featured,
   amenityIds,
   city,
@@ -24,6 +25,7 @@ getHotelService: async ({
   sortBy?: string;
   order?: string;
   search?: string;
+  keyword?: string;        
   featured?: boolean;
   amenityIds?: string[];
   city?: string;
@@ -42,6 +44,7 @@ getHotelService: async ({
       sortBy,
       order,
       search: search || undefined,
+      keyword: keyword || undefined,   
       featured: featured ? "true" : undefined,
       amenityIds: amenityIds?.length ? amenityIds.join(",") : undefined,
       city: city || undefined,

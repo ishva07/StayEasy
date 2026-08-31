@@ -10,6 +10,8 @@ import dashboardRoute from "../modules/dashboard/dashboard.route";
 import cityRoute from "../modules/city/city.route";
 import propertyTypeRoute from "../modules/propertyType/propertyType.route";
 import reviewRoute from "../modules/reviews/reviews.route";
+import aiSearchRoute from "../modules/aiSearchLog/aiSearchLog.route";
+import aiSearchLogAdminRoute from "../modules/aiSearchLogAdmin/aiSearchLogAdmin.route";
 
 const route = Router();
 
@@ -24,5 +26,7 @@ route.use("/dashboard",dashboardRoute);
 route.use("/city",cityRoute);
 route.use("/property-type",propertyTypeRoute);
 route.use("/reviews",reviewRoute);
+route.use("/search/ai", aiSearchRoute);
+route.use("/ai-search-logs",aiSearchLogAdminRoute)
 
 export default route;

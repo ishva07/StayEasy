@@ -81,6 +81,7 @@ model Hotel {
   isFeatured Boolean @default(false)
   avgReview Float @default(0)
   reviewCount Int @default(0)
+  searchVector Unsupported("tsvector")?
   room        Room[]
   review Review[]
   hotelAmenities HotelAmenities[]
@@ -205,4 +206,21 @@ enum ReviewStatus{
   PENDING
   REJECT
   PUBLISH
+}
+
+model AiSearchLog {
+  id            String   @id @default(cuid())
+  rawQuery      String
+  outcome       AiSearchOutcome
+  failureReason String?
+  latencyMs     Int?
+  userId        String?
+  createdAt     DateTime @default(now())
+
+  @@index([outcome, createdAt])
+}
+
+enum AiSearchOutcome {
+  SUCCESS
+  FALLBACK
 }
