@@ -31,6 +31,7 @@ export const PERMISSIONS={
     VIEW_MY_REVIEW:"view_my_review",
     EDIT_REVIEW_STATUS:"edit_review_status",
     VIEW_ALL_REVIEW:"view_all_review",
+    VIEW_AI_SEARCH_LOG:"view_ai_search_log"
 }as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

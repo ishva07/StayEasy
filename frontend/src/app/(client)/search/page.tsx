@@ -10,6 +10,8 @@ import { FilterSidebar } from "@/features/client/hotels/components/FilterSidebar
 import { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal, X } from "lucide-react";
+import { AiSearchBar } from "@/features/client/aiSearch/components/AiSearchBar";
+import { AiSearchResult } from "@/features/client/aiSearch/validation/aiSearch.type";
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -32,6 +34,7 @@ function SearchPageContent() {
   const amenityIds =
     searchParams.get("amenityIds")?.split(",").filter(Boolean) ?? [];
   const search = searchParams.get("search") ?? undefined;
+  const keyword = searchParams.get("keyword") ?? undefined;   
   const minRating = searchParams.get("minRating") ?? undefined;
   const page = Number(searchParams.get("page") ?? 1);
   const minPrice = searchParams.get("minPrice") ?? undefined;
@@ -56,6 +59,7 @@ function SearchPageContent() {
     checkOut,
     guests,
     search,
+      keyword,          
     minRating: minRating ? Number(minRating) : undefined,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -86,6 +90,7 @@ function SearchPageContent() {
     params.delete("propertyType");
     params.delete("amenityIds");
     params.delete("search");
+    params.delete("keyword");    
     params.delete("minRating");
     params.delete("minPrice");
     params.delete("maxPrice");
@@ -99,6 +104,37 @@ function SearchPageContent() {
     router.push(`/search?${params.toString()}`);
   };
 
+ const handleAiSearchResult = (result: AiSearchResult, rawQuery: string) => {
+    const f = result.filters as (AiSearchResult["filters"] & {
+      keyword?: string | null;
+    }) | undefined;
+
+    if (f) {
+      updateFilters({
+        city: f.city ?? null,
+        propertyType: f.propertyType ?? null,
+        amenityIds: f.amenityIds ?? [],
+        guests: f.guests ? String(f.guests) : null,
+        checkIn: f.checkIn ?? null,
+        checkOut: f.checkOut ?? null,
+        minRating: f.minRating ? String(f.minRating) : null,
+        minPrice: f.minPrice ? String(f.minPrice) : null,
+        maxPrice: f.maxPrice ? String(f.maxPrice) : null,
+        search: null,
+        keyword: f.keyword ?? null,
+      });
+    } else {
+   
+      updateFilters({
+      city: null, propertyType: null, amenityIds: [],
+      guests: null, checkIn: null, checkOut: null,
+      minRating: null, minPrice: null, maxPrice: null,
+      search: null,
+      keyword: rawQuery,
+    });
+  }
+};
+
   const cityName = cities?.find((c: any) => c.id === city)?.name;
   const propertyTypeName = propertyTypes?.find(
     (t: any) => t.id === propertyType,
@@ -106,6 +142,8 @@ function SearchPageContent() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+      {mounted && <AiSearchBar onResult={handleAiSearchResult} />}
+
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display text-2xl font-bold mb-1 sm:mb-2">

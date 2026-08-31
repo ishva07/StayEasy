@@ -88,6 +88,11 @@ export default function AdminLayout({
             href: "/admin/amenities",
             icon: BedDouble,
           },
+          {
+            label: "AI Search Logs",
+            href: "/admin/aiSearchLog",
+            icon: Building2,
+          },
         ]}
       >
         {children}

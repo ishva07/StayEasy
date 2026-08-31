@@ -1,25 +1,31 @@
 import rateLimit from "express-rate-limit";
+import { createRedisRateLimiter } from "./createRedisRateLimiter.middleware";
 
-export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+export const loginLimiter = createRedisRateLimiter({
+  keyPrefix: "login",
+  windowSeconds: 15 * 60,
   max: 5,
-  message: { success: false, message: "Too many attempts, please try again later." },
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: "Too many attempts, please try again later.",
 });
 
-export const writeLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+export const refreshLimiter = createRedisRateLimiter({
+  keyPrefix: "refresh",
+  windowSeconds: 15 * 60,
+  max: 20, 
+  message: "Too many refresh attempts, please try again later.",
+});
+
+export const writeLimiter = createRedisRateLimiter({
+  keyPrefix: "write",
+  windowSeconds: 15 * 60,
   max: 30,
-  message: { success: false, message: "Too many requests, please slow down." },
-  standardHeaders: true,
-  legacyHeaders: false,
+  keyGenerator: (req) => (req as any).user?.id ?? req.ip ?? "unknown",
+  message: "Too many requests, please slow down.",
 });
 
-export const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+export const globalLimiter = createRedisRateLimiter({
+  keyPrefix: "global",
+  windowSeconds: 15 * 60,
   max: 200,
-  message: { success: false, message: "Too many requests from this IP, please try again later." },
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: "Too many requests from this IP, please try again later.",
 });
