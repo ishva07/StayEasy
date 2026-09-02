@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,7 +37,6 @@ import {
   ImagePlus,
   Sparkles,
   UploadCloud,
-  X,
   Check,
 } from "lucide-react";
 
@@ -48,9 +47,15 @@ interface HotelFormProps {
   defaultValues?: Partial<FormInput>;
   initialHeroImageUrl?: string | null;
   initialGalleryUrls?: string[];
-  onSubmit: (data: FormInput) => void;
+  onSubmit: (data: FormInput, galleryState: { keptExistingUrls: string[]; newGalleryFiles: File[] }) => void;
   isSubmitting?: boolean;
   submitLabel?: string;
+}
+
+interface GalleryItem {
+  key: string;
+  url: string;
+  file?: File;
 }
 
 // Small presentational wrapper — visual only, no logic
@@ -73,9 +78,7 @@ function SectionCard({
         </div>
         <div>
           <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
-          {subtitle && (
-            <p className="text-xs text-slate-500">{subtitle}</p>
-          )}
+          {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
         </div>
       </div>
       {children}
@@ -98,7 +101,9 @@ export function HotelForm({
   const { data: cityOptions, isLoading: isLoadingCities } = useGetAllCity();
   const { data: propertyTypeOptions, isLoading: isLoadingPropertyTypes } =
     useGetPropertyType();
-  const cities = Array.isArray(cityOptions) ? cityOptions : cityOptions?.data ?? [];
+  const cities = Array.isArray(cityOptions)
+    ? cityOptions
+    : (cityOptions?.data ?? []);
 
   const form = useForm<FormInput>({
     resolver: zodResolver(
@@ -128,21 +133,33 @@ export function HotelForm({
     setHeroPreview(initialHeroImageUrl);
   }, [initialHeroImageUrl]);
 
-  useEffect(() => {
-    const isSameGallery =
-      galleryPreviews.length === initialGalleryUrls.length &&
-      galleryPreviews.every((url, index) => url === initialGalleryUrls[index]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(
+    initialGalleryUrls.map((url) => ({ key: url, url })),
+  );
 
-    if (!isSameGallery) {
+  const prevInitialGalleryKey = useRef(initialGalleryUrls.join("|"));
+
+  useEffect(() => {
+    const key = initialGalleryUrls.join("|");
+    if (key !== prevInitialGalleryKey.current) {
+      prevInitialGalleryKey.current = key;
       setGalleryPreviews(initialGalleryUrls);
     }
-  }, [initialGalleryUrls, galleryPreviews]);
+  }, [initialGalleryUrls]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-24">
+      <form  onSubmit={form.handleSubmit((data) => {
+    const keptExistingUrls = galleryItems.filter((item) => !item.file).map((item) => item.url);
+    const newGalleryFiles = galleryItems.filter((item) => item.file).map((item) => item.file!);
+    onSubmit(data, { keptExistingUrls, newGalleryFiles });
+  })} className="space-y-6 pb-24">
         {/* ---- Basic Info ---- */}
-        <SectionCard icon={Building2} title="Basic Information" subtitle="Name, description and category">
+        <SectionCard
+          icon={Building2}
+          title="Basic Information"
+          subtitle="Name, description and category"
+        >
           <div className="space-y-5">
             <FormField
               control={form.control}
@@ -151,7 +168,11 @@ export function HotelForm({
                 <FormItem>
                   <FormLabel>Hotel Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Hotel Taj" className="h-11" {...field} />
+                    <Input
+                      placeholder="e.g. Hotel Taj"
+                      className="h-11"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -189,7 +210,10 @@ export function HotelForm({
                   return (
                     <FormItem>
                       <FormLabel>Property Type</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                      >
                         <FormControl>
                           <SelectTrigger className="h-11">
                             <SelectValue>
@@ -210,7 +234,7 @@ export function HotelForm({
                       </Select>
                       <FormMessage />
                     </FormItem>
-                  )
+                  );
                 }}
               />
 
@@ -224,9 +248,10 @@ export function HotelForm({
                       type="button"
                       onClick={() => field.onChange(!field.value)}
                       className={`h-11 w-full flex items-center justify-between rounded-md border px-3 text-sm transition
-                        ${field.value
-                          ? "border-slate-900 bg-slate-900 text-white"
-                          : "border-input bg-background text-slate-600"
+                        ${
+                          field.value
+                            ? "border-slate-900 bg-slate-900 text-white"
+                            : "border-input bg-background text-slate-600"
                         }`}
                     >
                       <span className="flex items-center gap-2">
@@ -243,7 +268,11 @@ export function HotelForm({
         </SectionCard>
 
         {/* ---- Location ---- */}
-        <SectionCard icon={MapPin} title="Location" subtitle="Where guests will find this property">
+        <SectionCard
+          icon={MapPin}
+          title="Location"
+          subtitle="Where guests will find this property"
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -283,7 +312,7 @@ export function HotelForm({
                     )}
                     <FormMessage />
                   </FormItem>
-                )
+                );
               }}
             />
             <FormField
@@ -293,7 +322,11 @@ export function HotelForm({
                 <FormItem>
                   <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Full address" className="h-11" {...field} />
+                    <Input
+                      placeholder="Full address"
+                      className="h-11"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -303,7 +336,11 @@ export function HotelForm({
         </SectionCard>
 
         {/* ---- Images ---- */}
-        <SectionCard icon={ImagePlus} title="Photos" subtitle="Hero image and gallery">
+        <SectionCard
+          icon={ImagePlus}
+          title="Photos"
+          subtitle="Hero image and gallery"
+        >
           <div className="space-y-6">
             <FormField
               control={form.control}
@@ -368,12 +405,16 @@ export function HotelForm({
                   <FormLabel>Gallery Images</FormLabel>
 
                   <div className="flex flex-wrap gap-3">
-                    {galleryPreviews.map((url, idx) => (
+                    {galleryItems.map((item) => (
                       <div
-                        key={idx}
-                        className="h-20 w-20 rounded-lg overflow-hidden bg-muted ring-1 ring-slate-200"
+                        key={item.key}
+                        className="relative h-20 w-20 overflow-hidden rounded-lg bg-muted ring-1 ring-slate-200"
                       >
-                        <img src={url} className="h-full w-full object-cover" />
+                        <img
+                          src={item.url}
+                          alt="Hotel gallery preview"
+                          className="h-full w-full object-cover"
+                        />
                       </div>
                     ))}
 
@@ -391,13 +432,24 @@ export function HotelForm({
                         className="hidden"
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           const files = Array.from(e.target.files ?? []);
-                          field.onChange(files);
-                          if (files.length) {
-                            setGalleryPreviews((prev) => [
-                              ...prev,
-                              ...files.map((f) => URL.createObjectURL(f)),
-                            ]);
-                          }
+                          if (!files.length) return;
+
+                          const newItems = files.map((file) => ({
+                            key: crypto.randomUUID(),
+                            url: URL.createObjectURL(file),
+                            file,
+                          }));
+                          setGalleryItems((prev) => [...prev, ...newItems]);
+
+                          const updatedFiles = [
+                            ...(field.value ?? []),
+                            ...files,
+                          ];
+                          field.onChange(updatedFiles);
+
+                          // Reset so selecting the exact same file again after removing
+                          // it still fires onChange (browsers dedupe identical selections)
+                          e.target.value = "";
                         }}
                       />
                     </label>
@@ -405,7 +457,7 @@ export function HotelForm({
 
                   {mode === "edit" && (
                     <p className="text-xs text-slate-400">
-                      Existing images shown above; selecting new files adds more (doesn't remove old ones)
+                      Add more images to the existing gallery. Existing images stay in place.
                     </p>
                   )}
                   <FormMessage />
@@ -416,7 +468,11 @@ export function HotelForm({
         </SectionCard>
 
         {/* ---- Amenities ---- */}
-        <SectionCard icon={Sparkles} title="Amenities" subtitle="What this property offers">
+        <SectionCard
+          icon={Sparkles}
+          title="Amenities"
+          subtitle="What this property offers"
+        >
           <FormField
             control={form.control}
             name="amenitiesIds"
@@ -424,7 +480,9 @@ export function HotelForm({
               <FormItem>
                 <div className="flex flex-wrap gap-2">
                   {isLoadingAmenities ? (
-                    <p className="text-sm text-muted-foreground">Loading amenities...</p>
+                    <p className="text-sm text-muted-foreground">
+                      Loading amenities...
+                    </p>
                   ) : (
                     amenityOptions?.map((amenity: any) => (
                       <FormField
@@ -440,14 +498,17 @@ export function HotelForm({
                                 const current = field.value ?? [];
                                 field.onChange(
                                   isChecked
-                                    ? current.filter((id: string) => id !== amenity.id)
+                                    ? current.filter(
+                                        (id: string) => id !== amenity.id,
+                                      )
                                     : [...current, amenity.id],
                                 );
                               }}
                               className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium transition
-                                ${isChecked
-                                  ? "border-slate-900 bg-slate-900 text-white"
-                                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                                ${
+                                  isChecked
+                                    ? "border-slate-900 bg-slate-900 text-white"
+                                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                                 }`}
                             >
                               {isChecked && <Check className="h-3 w-3" />}

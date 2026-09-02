@@ -46,33 +46,48 @@ export function EditHotelContent() {
     [hotel?.imageGallery],
   );
 
-  const handleSubmit = (data: editHotelInputData) => {
+  const handleSubmit = (
+  data: editHotelInputData,
+  galleryState: { keptExistingUrls: string[]; newGalleryFiles: File[] }
+)  => {
     editHotel(
-      {
-        hotelId: id,
-        data: {
-          name: data.name,
-          description: data.description,
-          cityId: data.cityId,
-          propertyTypeId: data.propertyTypeId,
-          address: data.address,
-          isFeatured: data.isFeatured,
-          heroImage: data.heroImage,
-        },
+    {
+      hotelId: id,
+      data: {
+        name: data.name,
+        description: data.description,
+        cityId: data.cityId,
+        propertyTypeId: data.propertyTypeId,
+        address: data.address,
+        isFeatured: data.isFeatured,
+        heroImage: data.heroImage,
       },
-      {
-        onSuccess: () => {
-          if (data.amenitiesIds?.length) {
-            updateAmenities({ hotelId: id, data: { amenitiesId: data.amenitiesIds } });
-          }
-          if (data.imageGallery?.length) {
-            updateImageGallery({ hotelId: id, data: { imageGallery: data.imageGallery } });
-          }
-          router.push("/admin/hotels");
-        },
+    },
+    {
+      onSuccess: () => {
+        if (data.amenitiesIds?.length) {
+          updateAmenities({ hotelId: id, data: { amenitiesId: data.amenitiesIds } });
+        }
+
+        const galleryChanged =
+          galleryState.newGalleryFiles.length > 0 ||
+          galleryState.keptExistingUrls.length !== initialGalleryUrls.length;
+
+        if (galleryChanged) {
+          updateImageGallery({
+            hotelId: id,
+            data: {
+              existingUrls: galleryState.keptExistingUrls,
+              imageGallery: galleryState.newGalleryFiles,
+            },
+          });
+        }
+
+        router.push("/admin/hotels");
       },
-    );
-  };
+    },
+  );
+};
 
   if (isLoading)
     return <p className="text-sm text-muted-foreground">Loading hotel...</p>;

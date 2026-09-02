@@ -1,7 +1,8 @@
 import z from "zod";
 
 export const updateHotelImageGallerySchema = z.object({
-    imageGallery:z.array(z.instanceof(File,{message:"image are required while updating hotel image gallery"}))
+    imageGallery: z.array(z.instanceof(File, { message: "image are required while updating hotel image gallery" })),
+    existingUrls: z.array(z.string()).default([]),
 })
 
-export  type updateHotelImageGalleryInput = z.infer<typeof updateHotelImageGallerySchema>;
+export type updateHotelImageGalleryInput = z.infer<typeof updateHotelImageGallerySchema>;

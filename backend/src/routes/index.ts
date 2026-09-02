@@ -12,6 +12,10 @@ import propertyTypeRoute from "../modules/propertyType/propertyType.route";
 import reviewRoute from "../modules/reviews/reviews.route";
 import aiSearchRoute from "../modules/aiSearchLog/aiSearchLog.route";
 import aiSearchLogAdminRoute from "../modules/aiSearchLogAdmin/aiSearchLogAdmin.route";
+import roleRoute from "../modules/roles/role.route";
+import userRoute from "../modules/user/user.route";
+import permissionRoute from "../modules/permission/permission.route";
+import rolePermissionRoute from "../modules/role-permission/role-permission.route";
 
 const route = Router();
 
@@ -27,6 +31,10 @@ route.use("/city",cityRoute);
 route.use("/property-type",propertyTypeRoute);
 route.use("/reviews",reviewRoute);
 route.use("/search/ai", aiSearchRoute);
-route.use("/ai-search-logs",aiSearchLogAdminRoute)
+route.use("/ai-search-logs",aiSearchLogAdminRoute);
+route.use("/role", roleRoute);
+route.use("/role-permission", rolePermissionRoute);
+route.use("/permission", permissionRoute);
+route.use("/user", userRoute);
 
 export default route;
