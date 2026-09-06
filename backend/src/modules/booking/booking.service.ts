@@ -2,19 +2,25 @@ import { BookingStatus } from "@prisma/client";
 import prisma from "../../config/db";
 import ApiError from "../../utils/ApiError";
 import { CreateBooking } from "./booking.type";
+import { acquireBookingHold, releaseBookingHold } from "./bookingHold";
+import razorpayClient from "../../config/razorpay";
+import { issueRefund } from "../payments/razorpayRefund";
+import redisClient from "../../config/redis";
 
-export const bookingService = async (userId: string, data: CreateBooking) => {
+export const initiateBookingService = async (
+  userId: string,
+  data: CreateBooking,
+) => {
   if (data.checkOut <= data.checkIn)
     throw new ApiError(
-      404,
-      "checkIn date can't be grater then checkout Date..",
+      400,
+      "checkIn date can't be greater than checkout date..",
     );
 
   const room = await prisma.room.findFirst({
     where: { id: data.roomId },
-    select: { price: true },
+     select: { price: true, capacity: true },
   });
-
   if (!room) throw new ApiError(404, "No Room Exist..");
 
   const dateOverlapping = await prisma.booking.findFirst({
@@ -25,47 +31,70 @@ export const bookingService = async (userId: string, data: CreateBooking) => {
       checkOut: { gt: data.checkIn },
     },
   });
-
   if (dateOverlapping)
     throw new ApiError(400, "room already booked.. try different date");
 
+  const hold = await acquireBookingHold(
+    data.roomId,
+    data.checkIn,
+    data.checkOut,
+    userId,
+  );
+  if (!hold.acquired) {
+    throw new ApiError(
+      409,
+      "This room is currently being booked by someone else. Please try again shortly.",
+    );
+  }
+
   const dayCount = Math.ceil(
-    (data.checkOut.getTime() - data.checkIn.getTime()) / (1000 * 60 * 60* 24),
+    (data.checkOut.getTime() - data.checkIn.getTime()) / (1000 * 60 * 60 * 24),
   );
   const totalPrice = dayCount * Number(room.price);
 
-  const newBooking = await prisma.booking.create({
-    data: {
-      roomId: data.roomId,
-      checkIn: new Date(data.checkIn),
-      checkOut: new Date(data.checkOut),
-      userId,
-      totalPrice,
-    },
-  });
+  let order;
+  try {
+    order = await razorpayClient.orders.create({
+      amount: Math.round(totalPrice * 100),
+      currency: "INR",
+      receipt: hold.holdId,
+      notes: {
+        roomId: data.roomId,
+        userId,
+        checkIn: data.checkIn.toISOString(),
+        checkOut: data.checkOut.toISOString(),
+        guests: String(data.guests),
+        holdId: hold.holdId!,
+      },
+    });
+  } catch (err) {
+    await releaseBookingHold(data.roomId, data.checkIn, data.checkOut);
+    console.error("Razorpay order creation failed:", err);
+    throw new ApiError(502, "Unable to initiate payment. Please try again.");
+  }
 
-  return newBooking;
+  return {
+    holdId: hold.holdId,
+    roomId: data.roomId,
+    checkIn: data.checkIn,
+    checkOut: data.checkOut,
+    totalPrice,
+    razorpayOrderId: order.id,
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+    amount: order.amount,
+    currency: order.currency,
+  };
 };
 
-export const cancelBookingService = async (
-  bookingId: string,
-  userId: string,
-) => {
-  const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
-  if (!booking) throw new ApiError(404, "No Booking Found");
+ export const validTransitions: Record<string, string[]> = {
+    PENDING: [],  
+    CONFIRMED: ["CHECKIN", "CANCELED"],
+    CHECKIN: ["CHECKOUT"],
+    CHECKOUT: [],
+    CANCELED: [],
+  };
 
-  if (booking.userId !== userId)
-    throw new ApiError(404, "No Booking available for this user.");
-
-  if (booking.status != "PENDING")
-    throw new ApiError(400, "Only pending status room can be cancel");
-
-  const updatedStatus = await prisma.booking.update({
-    where: { id: bookingId },
-    data: { status: "CANCELED" },
-  });
-  return updatedStatus;
-};
+  export const getBookingStatusTransitionsService = () => validTransitions;
 
 export const changeBookingStatusService = async (
   bookingId: string,
@@ -74,13 +103,9 @@ export const changeBookingStatusService = async (
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking) throw new ApiError(404, "No Booking Found");
 
-  const validTransitions: Record<string, string[]> = {
-    PENDING: ["CONFIRMED", "CANCELED"],
-    CONFIRMED: ["CHECKIN", "CANCELED"],
-    CHECKIN: ["CHECKOUT"],
-    CHECKOUT: [],
-    CANCELED: [],
-  };
+  if (status === "PENDING") {
+    throw new ApiError(400, "PENDING is not a valid target status.");
+  }
 
   if (!validTransitions[booking.status]?.includes(status)) {
     throw new ApiError(
@@ -119,13 +144,12 @@ export const getMyBookingsService = async (
       where: { userId },
       skip,
       take: limit,
-      orderBy: {
-        [sortByFilter]: orderByFilter,
+      orderBy: { [sortByFilter]: orderByFilter },
+      include: {
+        room: { include: { hotel: { select: { name: true, city: true } } } },
+        review: true,
+        payment: { select: { status: true, refundStatus: true } }, 
       },
-      include: { 
-        room: { include: { hotel: { select: { name: true , city:true} } } } ,
-        review:true
-    },
     }),
     prisma.booking.count({ where: { userId } }),
   ]);
@@ -139,8 +163,12 @@ export const getMyBookingsService = async (
   };
 };
 
-export const getAllBookingsService = async (  { page = 1, limit = 10, sortBy = "createdAt", order = "desc" }) => {
-
+export const getAllBookingsService = async ({
+  page = 1,
+  limit = 10,
+  sortBy = "createdAt",
+  order = "desc",
+}) => {
   const skip = (page - 1) * limit;
   const allowedSortBy = [
     "createdAt",
@@ -162,7 +190,10 @@ export const getAllBookingsService = async (  { page = 1, limit = 10, sortBy = "
       orderBy: {
         [sortByFilter]: orderByFilter,
       },
-      include: { room: { include: { hotel: { select: { name: true } } } } },
+      include: { 
+        room: { include: { hotel: { select: { name: true } } } },
+          payment: { select: { status: true, refundStatus: true } }, 
+    },
     }),
     prisma.booking.count(),
   ]);
@@ -173,32 +204,118 @@ export const getAllBookingsService = async (  { page = 1, limit = 10, sortBy = "
     page,
     limit,
     totalPages: Math.ceil(total / limit),
-  }
-}
+  };
+};
 
-
-export const checkRoomAvailabilityService = async({roomId,checkIn,checkOut}:CreateBooking)=>{
-  const roomExist = await prisma.room.findUnique({where:{id:roomId}})
-  if(!roomExist)
-    throw new ApiError(404, "No Room Exist ");
-
-  const roomAvailable = await prisma.booking.findFirst({
-    where:{
-      roomId,
-      status:{not:"CANCELED"},
-      checkIn:{lt:checkOut},
-      checkOut:{gt:checkIn}
-    }
+export const getBookingByIdService = async (
+  bookingId: string,
+  userIds: string,
+) => {
+  const booking = await prisma.booking.findFirst({
+    where: { id: bookingId, userId: userIds },
+    include: {
+      room: { include: { hotel: { select: { name: true, city: true } } } },
+    },
   });
-  if(roomAvailable)
-    return false;
+  if (!booking) throw new ApiError(404, "not booking found");
+  return booking;
+};
 
-  return true;
-}
+export type BookingConfirmationStatus =
+  | { status: "PENDING" }
+  | { status: "CONFIRMED"; bookingId: string }
+  | { status: "REFUND_PROCESSING" }
+  | { status: "REFUND_COMPLETED" }
+  | { status: "REFUND_FAILED" };
 
-export const getBookingByIdService = async(bookingId:string,userIds:string) =>{
-        const booking = await prisma.booking.findFirst({where:{id:bookingId,userId:userIds},include:{room:{include:{hotel:{select:{name:true, city:true}}}}}});
-        if(!booking)
-          throw new ApiError(404, "not booking found")
-        return booking
-}
+export const getBookingConfirmationStatusService = async (
+  holdId: string,
+): Promise<BookingConfirmationStatus> => {
+  const payment = await prisma.payment.findUnique({
+    where: { holdId },
+    select: { bookingId: true, refundStatus: true },
+  });
+
+  if (!payment) {
+    return { status: "PENDING" };
+  }
+
+  if (payment.bookingId) {
+    return { status: "CONFIRMED", bookingId: payment.bookingId };
+  }
+
+  switch (payment.refundStatus) {
+    case "COMPLETED":
+      return { status: "REFUND_COMPLETED" };
+    case "FAILED":
+      return { status: "REFUND_FAILED" };
+    default:
+      return { status: "REFUND_PROCESSING" };
+  }
+};
+
+export const cancelBookingService = async (
+  bookingId: string,
+  userId: string,
+) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { payment: true },
+  });
+  if (!booking) throw new ApiError(404, "No Booking Found");
+
+  if (booking.userId !== userId)
+    throw new ApiError(404, "No Booking available for this user.");
+
+  if (booking.status !== "CONFIRMED") {
+    throw new ApiError(
+      400,
+      "Only confirmed bookings can be cancelled. This booking cannot be cancelled in its current state.",
+    );
+  }
+
+  if (new Date() >= booking.checkIn) {
+    throw new ApiError(400, "Cannot cancel after check-in has passed.");
+  }
+
+  if (!booking.payment || !booking.payment.razorpayPaymentId) {
+    throw new ApiError(
+      500,
+      "No payment record found for this booking — cannot process refund.",
+    );
+  }
+
+  const updatedBooking = await prisma.$transaction(async (tx) => {
+    const updated = await tx.booking.update({
+      where: { id: bookingId },
+      data: { status: "CANCELED" },
+    });
+    await tx.payment.update({
+      where: { id: booking.payment!.id },
+      data: { refundStatus: "PROCESSING" },
+    });
+    return updated;
+  });
+
+  try {
+    const refund = await issueRefund(
+      booking.payment.razorpayPaymentId,
+      Number(booking.totalPrice),
+    );
+    await prisma.payment.update({
+      where: { id: booking.payment.id },
+      data: { razorpayRefundId: refund.id },
+    });
+  } catch (err) {
+    console.error(
+      `CRITICAL: refund failed for booking ${bookingId} (paymentId: ${booking.payment.razorpayPaymentId}). Manual intervention required.`,
+      err,
+    );
+    await prisma.payment.update({
+      where: { id: booking.payment.id },
+      data: { refundStatus: "FAILED" },
+    });
+  }
+
+  return updatedBooking;
+};

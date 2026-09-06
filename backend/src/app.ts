@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import route from "./routes";
 import cors from "cors"
 import { globalLimiter } from "./middleware/rateLimit.middleware";
+import { razorpayWebhookController } from "./modules/payments/payment.controller";
 const app = express()
 
 app.set("trust proxy", 1);
@@ -19,6 +20,13 @@ app.use(
     credentials: true,
   })
 );
+
+app.post(
+  "/api/v1/payments/webhook",
+  express.raw({ type: "application/json" }),
+  razorpayWebhookController,
+);
+
 app.use(express.json());
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }

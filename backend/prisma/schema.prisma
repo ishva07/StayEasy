@@ -166,6 +166,8 @@ model Booking{
   roomId String
   userId String
   review Review?
+  payment Payment?
+  guests Int @default(1)
   user User @relation(fields: [userId], references: [id])
   room Room @relation(fields: [roomId],references: [id])
 
@@ -223,4 +225,44 @@ model AiSearchLog {
 enum AiSearchOutcome {
   SUCCESS
   FALLBACK
+}
+
+model Payment {
+  id                  String        @id @default(cuid())
+  bookingId           String?       @unique
+  booking             Booking?      @relation(fields: [bookingId], references: [id])
+  holdId              String?       @unique  
+  razorpayOrderId     String        @unique
+  razorpayPaymentId   String?       @unique
+  amount              Decimal       @db.Decimal(10, 2)
+  currency            String        @default("INR")
+  status              PaymentStatus @default(CREATED)
+  refundStatus        RefundStatus  @default(NONE)
+  razorpayRefundId    String?
+  orphanReason        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([razorpayOrderId])
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
+enum RefundStatus {
+  NONE
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  eventType String
+  createdAt DateTime @default(now())
 }
