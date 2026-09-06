@@ -16,5 +16,9 @@ export const bookingService = {
  cancelBooking:async(bookingId:string)=>{
     const res = await api.patch(`/bookings/${bookingId}/cancel`);
     return res.data.data;
- }
+ },
+ getStatusTransitions: async () => {
+  const res = await api.get("/booking/status-transitions");
+  return res.data.data as Record<string, string[]>;
+},
 };

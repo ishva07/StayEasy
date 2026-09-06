@@ -21,11 +21,10 @@ import {
   LogOut,
   XCircle,
   Star,
+  Ban,
 } from "lucide-react";
 
-const STATUS_CONFIG: Record<
-  string,
-  {
+const STATUS_CONFIG: Record<string, {
     text: string;
     dot: string;
     textColor: string;
@@ -70,6 +69,12 @@ const STATUS_CONFIG: Record<
   },
 };
 
+const REFUND_CONFIG: Record<string, { text: string; textColor: string; bgColor: string }> = {
+  PROCESSING: { text: "Refund in progress", textColor: "text-amber-700", bgColor: "bg-amber-50" },
+  COMPLETED: { text: "Refund completed", textColor: "text-emerald-700", bgColor: "bg-emerald-50" },
+  FAILED: { text: "Refund failed — contact support", textColor: "text-red-700", bgColor: "bg-red-50" },
+};
+
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString(undefined, {
     month: "short",
@@ -94,16 +99,18 @@ function BookingCard({
   const imageUrl = booking.room?.roomImage ? `${booking.room.roomImage}` : "";
 
   const isCompleted = booking.status === "CHECKOUT";
-  const isPending = booking.status === "PENDING";
   const hasReview = !!booking.review;
+  const refundStatus = booking.payment?.refundStatus;
+  const refund = refundStatus && refundStatus !== "NONE" ? REFUND_CONFIG[refundStatus] : null;
+
+  const canCancel =
+    booking.status === "CONFIRMED" && new Date(booking.checkIn) > new Date();
 
   return (
     <article
       className="
-        relative
-        min-h-[123px]
         overflow-hidden
-        rounded-xl
+        rounded-2xl
         border
         border-[#d9d5cc]
         bg-white
@@ -112,202 +119,133 @@ function BookingCard({
         duration-200
         hover:border-[#c8c2b7]
         hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]
-        hover:shadow-lg
-        transition-shadow
       "
     >
-      <div className="p-4">
-        <div className="flex items-center gap-3 h-full">
-          <div
-            className="
-              w-1/3
-                h-full
-                shrink-0
-                overflow-hidden
-              rounded-lg
-              bg-[#eeeae3]
-            "
-          >
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={booking.room?.hotel?.name ?? "Hotel"}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <BedDouble className="h-5 w-5 text-muted-foreground/50" />
-              </div>
+      <div className="flex flex-col sm:flex-row gap-5 p-5">
+        {/* Image */}
+        <div className="h-44 w-full sm:h-auto sm:w-48 shrink-0 overflow-hidden rounded-xl bg-[#eeeae3]">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={booking.room?.hotel?.name ?? "Hotel"}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <BedDouble className="h-6 w-6 text-muted-foreground/50" />
+            </div>
+          )}
+        </div>
+
+        {/* Details */}
+        <div className="min-w-0 flex-1 flex flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="min-w-0 truncate font-display text-xl font-medium leading-tight text-[#191814]">
+              {booking.room?.hotel?.name ?? "Hotel"}
+            </h2>
+
+            <div
+              className={`shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${status.bgColor} ${status.textColor}`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
+              {status.text}
+            </div>
+          </div>
+
+          {booking.room?.name && (
+            <p className="mt-0.5 flex items-center gap-1.5 text-[13px] text-[#777168]">
+              <BedDouble className="h-3.5 w-3.5" />
+              {booking.room.name}
+            </p>
+          )}
+
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+            <p className="flex items-center gap-1.5 font-display text-lg font-semibold text-[#191814]">
+              <CalendarDays className="h-4 w-4 text-[#777168]" />
+              {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}
+            </p>
+
+            {booking.room?.capacity && (
+              <span className="flex items-center gap-1.5 text-[13px] text-[#5f5b54]">
+                <Users className="h-3.5 w-3.5 text-[#777168]" />
+                {booking.room.capacity} {booking.room.capacity === 1 ? "adult" : "adults"}
+              </span>
             )}
           </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h2
-                className="
-                  min-w-0
-                  truncate
-                  font-display
-                  text-[18px]
-                  font-medium
-                  leading-tight
-                  text-[#191814]
-                "
-              >
-                {booking.room?.hotel?.name ?? "Hotel"}
-              </h2>
+          {refund && (
+            <div
+              className={`mt-3 inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${refund.bgColor} ${refund.textColor}`}
+            >
+              <Ban className="h-3 w-3" />
+              {refund.text}
+            </div>
+          )}
 
-              <div className={`absolute top-2 right-2 flex items-center gap-1.5 rounded-full px-2 py-[3px] text-[11px] font-medium ${status.bgColor} ${status.textColor}`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`}></span>
-                  {status.text}
-                </div>
+          {/* Spacer pushes footer row to the bottom regardless of content above */}
+          <div className="flex-1" />
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#e5e1d9] pt-4">
+            <div>
+              {booking.totalPrice ? (
+                <p className="font-display text-xl font-semibold tracking-tight text-[#164f3d]">
+                  ₹{Number(booking.totalPrice).toLocaleString()}
+                </p>
+              ) : (
+                <p className="text-[12px] text-[#6d685f]">
+                  Booked on {formatDate(booking.createdAt)}
+                </p>
+              )}
+              {booking.totalPrice && (
+                <p className="text-[11px] text-[#8a857a]">
+                  Booked on {formatDate(booking.createdAt)}
+                </p>
+              )}
             </div>
 
-            <div
-              className="
-                mt-2
-                flex
-                flex-wrap
-                items-center
-                gap-x-3
-                gap-y-1
-                text-[12px]
-                leading-none
-                text-[#5f5b54]
-              "
-            >
-              {booking.room?.name && (
-                <span className="inline-flex items-center gap-1">
-                  <BedDouble className="h-3.5 w-3.5 text-[#777168]" />
-                  {booking.room.name}
+            <div className="flex items-center gap-2">
+              {canCancel && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onCancel(booking)}
+                  className="h-8 rounded-full border-red-200 bg-transparent px-3.5 text-[12px] font-medium text-red-600 hover:bg-red-50 hover:border-red-300"
+                >
+                  Cancel booking
+                </Button>
+              )}
+
+              {isCompleted && !hasReview && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onReview(booking)}
+                  className="h-8 rounded-full border-[#b9a46f] bg-transparent px-3.5 text-[12px] font-medium text-[#8c7644] hover:bg-[#f8f3e8]"
+                >
+                  <Star className="mr-1.5 h-3 w-3 fill-[#b9a46f] text-[#b9a46f]" />
+                  Leave a review
+                </Button>
+              )}
+
+              {isCompleted && hasReview && (
+                <span className="inline-flex items-center gap-1 text-[12px] text-[#6d685f]">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  Reviewed
                 </span>
               )}
 
-              <p className="text-[20px] font-bold text-[#191814] mt-1">
-                  {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}
-                </p>
-
-              {booking.room?.capacity && (
-                <span className="inline-flex items-center gap-1">
-                  <Users className="h-3.5 w-3.5 text-[#777168]" />
-                  {booking.room.capacity}{" "}
-                  {booking.room.capacity === 1 ? "adult" : "adults"}
-                </span>
-              )}
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => onViewHotel(booking)}
+                className="h-8 rounded-full bg-[#14513e] px-4 text-[12px] font-medium text-white shadow-md transition-colors hover:bg-[#0f4233]"
+              >
+                View hotel
+              </Button>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div
-        className="
-          flex
-          min-h-[40px]
-          items-center
-          justify-between
-          border-t
-          border-[#e5e1d9]
-          bg-[#faf9f6]
-          px-4
-          py-2
-        "
-      >
-        <div className="flex items-center">
-          {booking.totalPrice ? (
-            <p
-              className="
-                font-display
-                text-[16px]
-                font-semibold
-                tracking-tight
-                text-[#164f3d]
-              "
-            >
-              ₹{Number(booking.totalPrice).toLocaleString()}
-            </p>
-          ) : (
-            <p className="text-[11px] text-[#6d685f]">
-              Booked on {formatDate(booking.createdAt)}
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          {booking.totalPrice && (
-            <p className="hidden text-[11px] text-[#6d685f] sm:block">
-              Booked on {formatDate(booking.createdAt)}
-            </p>
-          )}
-
-          {isPending && (
-            <button
-              type="button"
-              onClick={() => onCancel(booking)}
-              className="
-                rounded-md
-                px-2
-                py-1.5
-                text-[11px]
-                font-medium
-                text-[#817a70]
-                transition-colors
-                hover:bg-red-50
-                hover:text-red-600
-              "
-            >
-              Cancel booking
-            </button>
-          )}
-
-          {isCompleted && !hasReview && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onReview(booking)}
-              className="
-                h-7
-                rounded-full
-                border-[#b9a46f]
-                bg-transparent
-                px-3
-                text-[11px]
-                font-medium
-                text-[#8c7644]
-                hover:bg-[#f8f3e8]
-              "
-            >
-              <Star className="mr-1.5 h-3 w-3 fill-[#b9a46f] text-[#b9a46f]" />
-              Leave a review
-            </Button>
-          )}
-
-          {isCompleted && hasReview && (
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#6d685f]">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-              Reviewed
-            </span>
-          )}
-
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => onViewHotel(booking)}
-            className="
-              h-8
-              rounded-full
-              bg-[#14513e]
-              hover:bg-[#0f4233]
-              px-4
-              text-[12px]
-              font-medium
-              text-white
-              shadow-md
-              transition-colors
-            "
-          >
-            View hotel
-          </Button>
         </div>
       </div>
     </article>
@@ -339,24 +277,17 @@ function MyBookingsContent() {
   if (isLoading) {
     return (
       <main className="min-h-screen bg-[#fdfcf9]">
-        <div className="mx-auto w-full max-w-[510px] lg:max-w-5xl px-4 py-12">
+        <div className="mx-auto w-full max-w-3xl px-4 py-12">
           <div className="mb-7 space-y-2">
             <div className="h-9 w-48 animate-pulse rounded-md bg-[#ebe8e1]" />
             <div className="h-4 w-72 animate-pulse rounded-md bg-[#ebe8e1]" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((item) => (
+          <div className="space-y-4">
+            {[1, 2, 3].map((item) => (
               <div
                 key={item}
-                className="
-                  h-[123px]
-                  animate-pulse
-                  rounded-xl
-                  border
-                  border-[#e5e1d9]
-                  bg-white
-                "
+                className="h-[180px] animate-pulse rounded-2xl border border-[#e5e1d9] bg-white"
               />
             ))}
           </div>
@@ -367,19 +298,9 @@ function MyBookingsContent() {
 
   return (
     <main className="min-h-screen bg-[#fdfcf9]">
-      <div className="mx-auto w-full max-w-[510px] lg:max-w-5xl px-4 pb-12 pt-8 sm:pt-12">
-        <header className="mb-8 lg:mb-10">
-          <h1
-            className="
-              font-display
-              text-[32px]
-              lg:text-[40px]
-              font-medium
-              leading-[1.05]
-              tracking-[-0.02em]
-              text-[#171612]
-            "
-          >
+      <div className="mx-auto w-full max-w-3xl px-4 pb-12 pt-8 sm:pt-12">
+        <header className="mb-8">
+          <h1 className="font-display text-[32px] lg:text-[40px] font-medium leading-[1.05] tracking-[-0.02em] text-[#171612]">
             My Bookings
           </h1>
 
@@ -387,34 +308,12 @@ function MyBookingsContent() {
             Manage your upcoming and past reservations.
           </p>
 
-          <div className="mt-6 h-px w-full bg-[#e5e1d9] hidden lg:block" />
+          <div className="mt-6 h-px w-full bg-[#e5e1d9]" />
         </header>
 
         {bookings.length === 0 ? (
-          <div
-            className="
-              rounded-xl
-              border
-              border-dashed
-              border-[#d8d3c9]
-              bg-white
-              px-6
-              py-16
-              text-center
-            "
-          >
-            <div
-              className="
-                mx-auto
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-full
-                bg-[#eef5f1]
-              "
-            >
+          <div className="rounded-xl border border-dashed border-[#d8d3c9] bg-white px-6 py-16 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#eef5f1]">
               <CalendarDays className="h-5 w-5 text-[#14513e]" />
             </div>
 
@@ -423,29 +322,19 @@ function MyBookingsContent() {
             </h2>
 
             <p className="mx-auto mt-1 max-w-xs text-[13px] leading-5 text-[#777168]">
-              When you book a stay, it&apos;ll show up here with all your
-              reservation details.
+              When you book a stay, it&apos;ll show up here with all your reservation details.
             </p>
 
             <Button
               type="button"
               onClick={() => router.push("/")}
-              className="
-                mt-5
-                h-9
-                rounded-full
-                bg-[#14513e]
-                px-5
-                text-xs
-                text-white
-                hover:bg-[#0f4233]
-              "
+              className="mt-5 h-9 rounded-full bg-[#14513e] px-5 text-xs text-white hover:bg-[#0f4233]"
             >
               Browse hotels
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="space-y-4">
             {bookings.map((booking: any) => (
               <BookingCard
                 key={booking.id}

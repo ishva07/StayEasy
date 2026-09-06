@@ -1,24 +1,27 @@
 import { Request, Response } from "express";
 import asyncHandler from "../../utils/asyncHandler";
 import {
-  bookingService,
   cancelBookingService,
   changeBookingStatusService,
-  checkRoomAvailabilityService,
   getAllBookingsService,
   getBookingByIdService,
+  getBookingConfirmationStatusService,
+  getBookingStatusTransitionsService,
   getMyBookingsService,
+  initiateBookingService,
 } from "./booking.service";
 import ApiResponse from "../../utils/ApiResponse";
 
-export const bookingController = asyncHandler(
+export const initiateBookingController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user.id;
     const data = req.body;
-    const newBooking = await bookingService(userId, data);
+    const initiatedBooking = await initiateBookingService(userId, data);
     res
-      .status(201)
-      .json(new ApiResponse(true, "Booking created Successfully.", newBooking));
+      .status(200)
+      .json(
+        new ApiResponse(true, "Booking initiated. Proceed to payment.", initiatedBooking),
+      );
   },
 );
 
@@ -73,15 +76,25 @@ export const getAllBookingsController = asyncHandler(async(req:Request,res:Respo
     res.status(200).json(new ApiResponse(true,"Get All Records successfully.",bookings))
 })
 
-export const checkRoomAvailabilityController = asyncHandler(async(req:Request,res:Response)=>{
-  const data = req.body;
-  const roomAvailable = await checkRoomAvailabilityService(data);
-  res.status(200).json(new ApiResponse(true,"room Availability status.",roomAvailable));
-})
-
 export const getBookingByIdController = asyncHandler(async (req: Request, res: Response) => {
   const  bookingId  = req.params.bookingId.toString();
   const userId = req.user.id;
   const booking = await getBookingByIdService(bookingId, userId);
   res.status(200).json(new ApiResponse(true, "Booking fetched successfully.", booking));
 });
+
+
+export const getBookingConfirmationStatusController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const holdId = req.params.holdId.toString();
+    const result = await getBookingConfirmationStatusService(holdId);
+    res.status(200).json(new ApiResponse(true, "Booking confirmation status.", result));
+  },
+);
+
+export const getBookingStatusTransitionsController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const transitions = getBookingStatusTransitionsService();
+    res.status(200).json(new ApiResponse(true, "Status transitions.", transitions));
+  },
+);

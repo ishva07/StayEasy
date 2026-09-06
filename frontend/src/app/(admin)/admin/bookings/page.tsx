@@ -10,10 +10,12 @@ import { useGetAllBookings } from "@/features/admin/booking/hooks/useGetAllBooki
 import { useChangeBookingStatus } from "@/features/admin/booking/hooks/useChangeBooking";
 import { getBookingColumns } from "@/features/admin/booking/components/booking-column";
 import { BookingStatus } from "@/features/admin/booking/types/booking.type";
+import { useBookingStatusTransitions } from "@/features/client/booking/hooks/useBookingStatusTransitions";
 
 function BookingsContent() {
     const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
     const [sorting, setSorting] = useState<SortingState>([]);
+    const { data: transitionsData } = useBookingStatusTransitions();
 
     const sortBy = sorting[0]?.id ?? "createdAt";
     const order = sorting[0]?.desc ? "desc" : "asc";
@@ -36,6 +38,7 @@ function BookingsContent() {
         onStatusChange: handleStatusChange,
         isUpdating,
         canChangeStatus: hasPermission(PERMISSIONS.CHANGE_BOOKiNG_STATUS), 
+         validTransitions: transitionsData ?? {},
     });
 
     return (

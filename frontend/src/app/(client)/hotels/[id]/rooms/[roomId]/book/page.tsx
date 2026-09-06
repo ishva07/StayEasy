@@ -2,18 +2,25 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useGetRoomById } from "@/features/rooms/hooks/useGetRoomById"; 
-import { useCreateBooking } from "@/features/client/booking/hooks/useCreateBookings";
+import { useGetRoomById } from "@/features/rooms/hooks/useGetRoomById";
+import { useInitiateBooking } from "@/features/client/booking/hooks/useInitiateBooking";
+import { loadRazorpayScript } from "@/lib/loadRazorpayScript";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Users, IndianRupee, CalendarDays } from "lucide-react";
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 export default function BookRoomPage() {
   const router = useRouter();
-  const rawParams = useParams();
   const { id: hotelId, roomId } = useParams<{ id: string; roomId: string }>();
-  const { data: room, isLoading } = useGetRoomById(hotelId, roomId);   
-  const { createBooking, isPending } = useCreateBooking();
+  const { data: room, isLoading } = useGetRoomById(hotelId, roomId);
+  const { mutate: initiateBooking, isPending } = useInitiateBooking();
+  const [guests, setGuests] = useState(1);
 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
@@ -49,25 +56,59 @@ export default function BookRoomPage() {
       setError("Check-out must be after check-in.");
       return;
     }
+    if (guests < 1 || guests > room.capacity) {
+      setError(`This room fits up to ${room.capacity} guests.`);
+      return;
+    }
 
-    createBooking(
-      { roomId, checkIn, checkOut },
+    initiateBooking(
+      { roomId, checkIn, checkOut, guests },
       {
-        onSuccess: (booking: any) => {
-          router.push(`/booking-success/${booking.id}`);
+        onSuccess: async (data) => {
+          const scriptLoaded = await loadRazorpayScript();
+          if (!scriptLoaded) {
+            setError("Couldn't load the payment gateway. Check your connection and try again.");
+            return;
+          }
+
+          const options = {
+            key: data.razorpayKeyId,
+            amount: data.amount,
+            currency: data.currency,
+            order_id: data.razorpayOrderId,
+            name: "StayEasy",
+            description: `${room.name} — ${room.hotel?.name ?? ""}`,
+            handler: function () {
+              router.push(`/booking-confirming?holdId=${data.holdId}`);
+            },
+            modal: {
+              ondismiss: function () {
+                setError("Payment cancelled. The room hold will release automatically in a few minutes.");
+              },
+            },
+            theme: {
+              color: "#009688",
+            },
+          };
+
+          const razorpay = new window.Razorpay(options);
+          razorpay.open();
         },
-      }
+        onError: (err: any) => {
+          setError(
+            err?.response?.data?.message ||
+              "Couldn't start checkout. This room may already be booked — try different dates.",
+          );
+        },
+      },
     );
   };
 
-  const roomImageUrl = room.roomImage
-    ? `${room.roomImage}`
-    : "";
+  const roomImageUrl = room.roomImage ? `${room.roomImage}` : "";
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:px-6 sm:py-12">
       <div className="mx-auto max-w-3xl space-y-8">
-        {/* Back link */}
         <button
           onClick={() => router.push(`/hotels/${hotelId}`)}
           className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/90 px-3.5 py-2 text-sm font-medium text-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-accent/70 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
@@ -84,7 +125,7 @@ export default function BookRoomPage() {
                   <img src={roomImageUrl} alt={room.name} className="h-full w-full object-cover" />
                 ) : null}
               </div>
-                <div className="space-y-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
@@ -112,7 +153,7 @@ export default function BookRoomPage() {
                 Reservation dates
               </div>
 
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="mt-6 grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
                   <label className="block text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                     Check-in
@@ -137,7 +178,22 @@ export default function BookRoomPage() {
                     className="rounded-full h-12 px-4 focus-visible:ring-primary/40 focus-visible:border-primary"
                   />
                 </div>
+                 <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                    Guests
+                  </label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={room.capacity}
+                    value={guests}
+                    onChange={(e) => setGuests(Number(e.target.value))}
+                    className="rounded-full h-12 px-4"
+                  />
+                  <p className="text-xs text-muted-foreground">Max {room.capacity} guests</p>
+                </div>
               </div>
+              
 
               {error && (
                 <p className="mt-4 rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
@@ -164,7 +220,7 @@ export default function BookRoomPage() {
           onClick={handleSubmit}
           disabled={isPending}
         >
-          {isPending ? "Booking..." : "Confirm Booking"}
+          {isPending ? "Preparing checkout..." : "Proceed to Payment"}
         </Button>
       </div>
     </div>

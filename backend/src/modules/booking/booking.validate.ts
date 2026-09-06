@@ -5,5 +5,8 @@ export const bookingSchema = z.object({
     checkIn: z.coerce.date(),
     checkOut: z.coerce.date(),
     roomId: z.string(),
+    guests: z.coerce.number().int().min(1), 
   }),
 });
+
+export const initiateBookingSchema = bookingSchema;
