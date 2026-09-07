@@ -20,8 +20,8 @@ import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { PERMISSIONS } from "@/constants/permissions";
 
 const STATUS_COLORS: Record<string, string> = {
-  CONFIRMED: "#3b82f6",
-  PENDING: "#f59e0b",
+  CONFIRMED: "#f59e0b",
+  PENDING: "#3b82f6",
   CANCELED: "#ef4444",
   CHECKIN: "#10b981",
   CHECKOUT: "#8b5cf6",
