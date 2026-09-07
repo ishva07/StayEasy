@@ -5,7 +5,8 @@ import { CreateBooking } from "./booking.type";
 import { acquireBookingHold, releaseBookingHold } from "./bookingHold";
 import razorpayClient from "../../config/razorpay";
 import { issueRefund } from "../payments/razorpayRefund";
-import redisClient from "../../config/redis";
+import { sendEmail } from "../../utils/mail";
+import { bookingCancelledTemplate, refundFailedTemplate } from "../../utils/emailTemplates";
 
 export const initiateBookingService = async (
   userId: string,
@@ -260,7 +261,11 @@ export const cancelBookingService = async (
 ) => {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { payment: true },
+    include: {
+      payment: true,
+      room: { include: { hotel: { select: { name: true } } } },
+      user: { select: { email: true, firstName: true } },
+    },
   });
   if (!booking) throw new ApiError(404, "No Booking Found");
 
@@ -297,6 +302,22 @@ export const cancelBookingService = async (
     return updated;
   });
 
+   sendEmail(
+    booking.user.email,
+    "Booking Cancelled — StayEasy",
+    bookingCancelledTemplate({
+      firstName: booking.user.firstName,
+      hotelName: booking.room.hotel.name,
+      roomName: booking.room.name,
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      guests: booking.guests,
+      totalPrice: booking.totalPrice.toString(),
+    }),
+  ).catch((err) => {
+    console.error(`Failed to send booking cancelled email to ${booking.user.email}:`, err);
+  });
+
   try {
     const refund = await issueRefund(
       booking.payment.razorpayPaymentId,
@@ -314,6 +335,19 @@ export const cancelBookingService = async (
     await prisma.payment.update({
       where: { id: booking.payment.id },
       data: { refundStatus: "FAILED" },
+    });
+
+    sendEmail(
+      booking.user.email,
+      "Refund Issue — StayEasy",
+      refundFailedTemplate({
+        firstName: booking.user.firstName,
+        hotelName: booking.room.hotel.name,
+        bookingId: booking.id,
+        totalPrice: booking.totalPrice.toString(),
+      }),
+    ).catch((emailErr) => {
+      console.error(`Failed to send refund-failed email to ${booking.user.email}:`, emailErr);
     });
   }
 

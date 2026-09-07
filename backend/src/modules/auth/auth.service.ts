@@ -29,14 +29,22 @@ export const registerAuthService = async (data: RegisterUserInterface) => {
 
   const userRole = await prisma.role.findFirst({ where: { name: "user" } });
   if (!userRole)
-    throw new ApiError(404, "No user rile exist, run seeder first..");
+    throw new ApiError(404, "No user role exist, run seeder first..");
 
   const hashedPassword = await hashPassword(data.password);
   const newUser = await prisma.user.create({
-    data: { email: data.email, password: hashedPassword, roleId: userRole.id },
+    data: {
+      email: data.email,
+      password: hashedPassword,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      roleId: userRole.id,
+    },
   });
   return {
     email: newUser.email,
+    firstName: newUser.firstName,
+    lastName: newUser.lastName,
     roleId: newUser.roleId,
   };
 };

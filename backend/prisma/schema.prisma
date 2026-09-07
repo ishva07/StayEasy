@@ -26,6 +26,8 @@ model User {
   booking Booking[]
   review Review[]
   refreshTokens RefreshToken[]
+  firstName String
+  lastName String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -232,6 +234,7 @@ model Payment {
   bookingId           String?       @unique
   booking             Booking?      @relation(fields: [bookingId], references: [id])
   holdId              String?       @unique  
+  userId              String?      
   razorpayOrderId     String        @unique
   razorpayPaymentId   String?       @unique
   amount              Decimal       @db.Decimal(10, 2)

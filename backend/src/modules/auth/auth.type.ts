@@ -2,6 +2,8 @@ export interface RegisterUserInterface {
   email: string;
   password: string;
   roleId: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface LoginUserInterface {
