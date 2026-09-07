@@ -18,7 +18,7 @@ export const bookingService = {
     return res.data.data;
  },
  getStatusTransitions: async () => {
-  const res = await api.get("/booking/status-transitions");
+  const res = await api.get("/bookings/status-transitions");
   return res.data.data as Record<string, string[]>;
 },
 };

@@ -72,7 +72,9 @@ export async function seedUser(){
         create:{
             email:"admin@example.com",
             password:adminPassword,
-            roleId:adminRole.id
+            roleId:adminRole.id,
+            firstName:"Admin",
+            lastName:"User"
         }
     })
 
