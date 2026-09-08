@@ -1,6 +1,7 @@
 # 🏨 StayEasy
 
-> A production-style hotel discovery and booking platform combining natural-language search, real-time room holds, Razorpay payments, and role-based hotel administration — built as a full-stack TypeScript monorepo.
+> A full-stack hotel discovery and booking platform, built to production-grade patterns — combining natural-language search, real-time room holds, Razorpay 
+payments, and role-based hotel administration.
 
 [![Node](https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -239,14 +240,13 @@ Indexed hotel filters, a composite index on `(roomId, status, checkIn, checkOut)
 
 ---
 
-## 📊 Project Metrics
+## 🧪 Testing
 
-| Metric | Value |
-|---|---|
-| Backend source | 88 files · ~3,571 lines |
-| Frontend source | 168 files · ~10,677 lines |
-| Prisma migrations | 26 |
-| Route modules | 11 (51 handlers + webhook endpoint) |
+Core flows — authentication, booking creation, concurrent booking holds, 
+payment webhook handling, cancellations, and refunds — were manually 
+tested across normal and edge-case scenarios, including simultaneous 
+booking attempts on the same room, expired holds, and duplicate/failed 
+webhook events.
 
 **Not yet present:** automated tests, CI/CD pipeline, coverage reports, load-testing setup — tracked below.
 
@@ -255,6 +255,5 @@ Indexed hotel filters, a composite index on `(roomId, status, checkIn, checkOut)
 ## 🗺 Roadmap
 
 - [ ] Automated tests (unit + integration) and a CI pipeline
-- [ ] Add Redis to `docker-compose.yml` for a fully containerized setup
 - [ ] Ownership-aware Redis hold release with atomic Lua-script acquisition
 - [ ] Structured logging & observability for payments, bookings, and AI latency
