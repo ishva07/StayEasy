@@ -102,7 +102,6 @@ export const roomUnavailableTemplate = (data: RoomUnavailableEmailData): string 
 interface RefundCompletedEmailData {
   firstName: string;
   totalPrice: number | string;
-  bookingId: string;
 }
 
 export const refundCompletedTemplate = (data: RefundCompletedEmailData): string => {
@@ -110,7 +109,6 @@ export const refundCompletedTemplate = (data: RefundCompletedEmailData): string 
     <p>Hi ${data.firstName},</p>
     <p>Good news — your refund of <strong>₹${data.totalPrice}</strong> has been successfully processed and sent to your original payment method.</p>
     <p>It may take a few business days to reflect in your account, depending on your bank.</p>
-    <p style="color: #666; font-size: 13px;">Reference ID: ${data.bookingId}</p>
   `;
   return wrapper("Refund Completed", body);
 };

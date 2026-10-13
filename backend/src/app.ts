@@ -12,8 +12,11 @@ const app = express()
 
 app.set("trust proxy", 1);
 
-app.use(globalLimiter);
-
+if (process.env.DISABLE_GLOBAL_LIMITER === "true") {
+  console.warn("WARNING: global rate limiter is DISABLED");
+} else {
+  app.use(globalLimiter);
+}
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,

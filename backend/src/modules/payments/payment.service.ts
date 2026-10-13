@@ -341,7 +341,6 @@ async function handleRefundProcessed(
       refundCompletedTemplate({
         firstName,
         totalPrice: refundedAmount,
-        bookingId: refundedPaymentId,
       }),
     ).catch((err) => {
       console.error(`Failed to send refund-completed email to ${email}:`, err);
