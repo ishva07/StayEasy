@@ -1,5 +1,6 @@
 import prisma from "../../config/db";
 import ApiError from "../../utils/ApiError";
+import { deleteCloudinaryImages } from "../../utils/cloudinaryImages";
 
 export const createCityService = async (name: string,cityImage:string |undefined) => {
   const cityExist = await prisma.city.findFirst({ where: {name}  });
@@ -27,6 +28,9 @@ export const editCityService = async (
         images:cityImage
     }
   });
+  if (cityImage && cityImage !== city.images) {
+    await deleteCloudinaryImages([city.images]);
+  }
   return editedCity;
 };
 
@@ -37,6 +41,7 @@ export const deleteCityService = async (cityId: string) => {
   const deletedCity = await prisma.city.delete({
     where: { id: cityId },
   });
+  await deleteCloudinaryImages([city.images]);
   return deletedCity;
 };
 
