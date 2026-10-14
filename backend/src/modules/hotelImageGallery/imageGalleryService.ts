@@ -1,5 +1,6 @@
 import prisma from "../../config/db"
 import ApiError from "../../utils/ApiError";
+import { deleteCloudinaryImages } from "../../utils/cloudinaryImages";
 
 export const getHotelImageGalleryService = async(hotelId:string) => {
     const hotelExist = await prisma.hotel.findUnique({where:{id:hotelId}});
@@ -17,7 +18,12 @@ export const updateHotelImageService = async(hotelId:string, urls:string[]) =>{
     if(!hotelExist)
         throw new ApiError(404,"Hotel Does not found..");
 
-    const updatedImages = await prisma.$transaction([
+    const previousImages = await prisma.hotelImages.findMany({
+        where:{hotelId},
+        select:{url:true},
+    });
+
+    await prisma.$transaction([
         prisma.hotelImages.deleteMany({where:{hotelId}}),
         prisma.hotelImages.createMany({
             data:urls.map((url)=>({
@@ -26,6 +32,12 @@ export const updateHotelImageService = async(hotelId:string, urls:string[]) =>{
             }))
         })
     ]);
+
+    await deleteCloudinaryImages(
+        previousImages
+            .map((image) => image.url)
+            .filter((url) => !urls.includes(url)),
+    );
 
     const updatedGalleryImage = await prisma.hotelImages.findMany({where:{hotelId},select:{url:true}})
     return updatedGalleryImage;

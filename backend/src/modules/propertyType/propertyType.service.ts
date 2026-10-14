@@ -1,5 +1,6 @@
 import prisma from "../../config/db";
 import ApiError from "../../utils/ApiError";
+import { deleteCloudinaryImages } from "../../utils/cloudinaryImages";
 
 export const createPropertyTypeService = async (name: string, image: string | undefined) => {
   const trimmedName = name?.trim();
@@ -35,22 +36,28 @@ export const editPropertyTypeService = async (
 
   const nextImage = image ?? existingPropertyType.image;
 
-  return prisma.propertyType.update({
+  const updatedPropertyType = await prisma.propertyType.update({
     where: { id: propertyTypeId },
     data: {
       name: nextName,
       image: nextImage,
     },
   });
+  if (image && image !== existingPropertyType.image) {
+    await deleteCloudinaryImages([existingPropertyType.image]);
+  }
+  return updatedPropertyType;
 };
 
 export const deletePropertyTypeService = async (propertyTypeId: string) => {
   const propertyType = await prisma.propertyType.findUnique({ where: { id: propertyTypeId } });
   if (!propertyType) throw new ApiError(404, "No property type exists with this id");
 
-  return prisma.propertyType.delete({
+  const deletedPropertyType = await prisma.propertyType.delete({
     where: { id: propertyTypeId },
   });
+  await deleteCloudinaryImages([propertyType.image]);
+  return deletedPropertyType;
 };
 
 export const getPropertyTypeService = async ({

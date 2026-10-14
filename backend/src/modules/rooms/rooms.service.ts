@@ -1,5 +1,6 @@
 import prisma from "../../config/db";
 import ApiError from "../../utils/ApiError";
+import { deleteCloudinaryImages } from "../../utils/cloudinaryImages";
 import { CreateRoomInterface, UpdateRoomInterface } from "./rooms.types";
 
 export const createRoomService = async ({
@@ -44,6 +45,9 @@ export const editRoomService = async (
   }
 
   const updatedRoom = await prisma.room.update({ where: { id: roomId }, data });
+  if (data.roomImage && data.roomImage !== roomExist.roomImage) {
+    await deleteCloudinaryImages([roomExist.roomImage]);
+  }
   return updatedRoom;
 };
 
@@ -56,6 +60,7 @@ export const deleteRoomService = async (hotelId: string, roomId: string) => {
   if (!roomExist) throw new ApiError(404, "No Room Available in this hotel");
 
   const deletedRoom = await prisma.room.delete({ where: { id: roomId } });
+  await deleteCloudinaryImages([roomExist.roomImage]);
   return deletedRoom;
 };
 

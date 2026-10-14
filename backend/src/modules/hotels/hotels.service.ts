@@ -1,5 +1,6 @@
 import prisma from "../../config/db";
 import ApiError from "../../utils/ApiError";
+import { deleteCloudinaryImages } from "../../utils/cloudinaryImages";
 import { CreateHotelInterface, UpdateHotelInterface } from "./hotels.types";
 
 export const createHotelsService = async (data: CreateHotelInterface) => {
@@ -35,9 +36,9 @@ export const createHotelsService = async (data: CreateHotelInterface) => {
 };
 
 export const editHotelsService = async (id: string, data: UpdateHotelInterface) => {
-  const hotelId = await prisma.hotel.findUnique({ where: { id } });
+  const hotel = await prisma.hotel.findUnique({ where: { id } });
 
-  if (!hotelId) throw new ApiError(404, "No hotel available on given id");
+  if (!hotel) throw new ApiError(404, "No hotel available on given id");
 
   if (data.name) {
     const hotelExist = await prisma.hotel.findFirst({ where: { name: data.name, NOT: { id } } });
@@ -45,15 +46,30 @@ export const editHotelsService = async (id: string, data: UpdateHotelInterface) 
   }
 
   const updatedHotel = await prisma.hotel.update({ where: { id }, data });
+  if (data.heroImage && data.heroImage !== hotel.heroImage) {
+    await deleteCloudinaryImages([hotel.heroImage]);
+  }
   return updatedHotel;
 };
 
 export const deleteHotelService = async (id: string) => {
-  const hotel = await prisma.hotel.findFirst({ where: { id }, select: { room: true } });
+  const hotel = await prisma.hotel.findUnique({
+    where: { id },
+    select: {
+      heroImage: true,
+      room: { select: { roomImage: true } },
+      imageGallery: { select: { url: true } },
+    },
+  });
 
   if (!hotel) throw new ApiError(404, "No hotel available on given id");
 
   const deletedHotel = await prisma.hotel.delete({ where: { id } });
+  await deleteCloudinaryImages([
+    hotel.heroImage,
+    ...hotel.room.map((room) => room.roomImage),
+    ...hotel.imageGallery.map((image) => image.url),
+  ]);
   return deletedHotel;
 };
 
