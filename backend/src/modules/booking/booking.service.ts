@@ -74,12 +74,32 @@ export const initiateBookingService = async (
     throw new ApiError(502, "Unable to initiate payment. Please try again.");
   }
 
+  const quotedAmount = Number(order.amount) / 100;
+  try {
+    await prisma.payment.create({
+      data: {
+        holdId: hold.holdId,
+        userId,
+        razorpayOrderId: order.id,
+        amount: quotedAmount,
+        status: "CREATED",
+      },
+    });
+  } catch (err) {
+    await releaseBookingHold(data.roomId, data.checkIn, data.checkOut);
+    console.error(
+      `Failed to save checkout payment for Razorpay order ${order.id}:`,
+      err,
+    );
+    throw new ApiError(502, "Unable to initiate payment. Please try again.");
+  }
+
   return {
     holdId: hold.holdId,
     roomId: data.roomId,
     checkIn: data.checkIn,
     checkOut: data.checkOut,
-    totalPrice,
+    totalPrice: quotedAmount,
     razorpayOrderId: order.id,
     razorpayKeyId: process.env.RAZORPAY_KEY_ID,
     amount: order.amount,
@@ -234,10 +254,10 @@ export const getBookingConfirmationStatusService = async (
 ): Promise<BookingConfirmationStatus> => {
   const payment = await prisma.payment.findUnique({
     where: { holdId },
-    select: { bookingId: true, refundStatus: true },
+    select: { bookingId: true, refundStatus: true, status: true },
   });
 
-  if (!payment) {
+  if (!payment || payment.status !== "PAID") {
     return { status: "PENDING" };
   }
 
