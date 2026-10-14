@@ -6,6 +6,7 @@ import { issueRefund } from "./razorpayRefund";
 import { sendEmail } from "../../utils/mail";
 import {
   bookingConfirmedTemplate,
+  paymentRefundInitiatedTemplate,
   refundCompletedTemplate,
   refundFailedTemplate,
   roomUnavailableTemplate,
@@ -104,9 +105,81 @@ async function handlePaymentCaptured(
   } | null = null;
 
   let orphanUserEmail: { email: string; firstName: string } | null = null;
+  let paymentRefundEmailReason: string | null = null;
 
   await prisma.$transaction(async (tx) => {
     await tx.webhookEvent.create({ data: { eventId, eventType } });
+
+    await tx.$queryRaw`
+      SELECT "id"
+      FROM "Room"
+      WHERE "id" = ${notes.roomId}
+      FOR UPDATE
+    `;
+
+    const checkoutPayment = await tx.payment.findUnique({
+      where: { razorpayOrderId },
+    });
+
+    if (checkoutPayment?.status === "PAID") return;
+
+    const capturedAmountMatches =
+      checkoutPayment !== null &&
+      Math.round(Number(checkoutPayment.amount) * 100) === amountPaise;
+    const checkoutDetailsMatch =
+      checkoutPayment !== null &&
+      checkoutPayment.userId === notes.userId &&
+      checkoutPayment.holdId === notes.holdId;
+
+    if (!checkoutPayment || !capturedAmountMatches || !checkoutDetailsMatch) {
+      const reason = !checkoutPayment
+        ? "the checkout details could not be verified"
+        : !capturedAmountMatches
+          ? `the captured amount (₹${amountRupees}) did not match the checkout amount (₹${Number(checkoutPayment.amount)})`
+          : "the checkout details did not match the payment";
+
+      const orphanPayment = checkoutPayment
+        ? await tx.payment.update({
+            where: { id: checkoutPayment.id },
+            data: {
+              status: "PAID",
+              razorpayPaymentId,
+              refundStatus: "PROCESSING",
+              orphanReason: reason,
+            },
+            select: { id: true },
+          })
+        : await tx.payment.create({
+            data: {
+              bookingId: null,
+              holdId: notes.holdId || null,
+              userId: notes.userId || null,
+              razorpayOrderId,
+              razorpayPaymentId,
+              amount: amountRupees,
+              status: "PAID",
+              refundStatus: "PROCESSING",
+              orphanReason: reason,
+            },
+            select: { id: true },
+          });
+
+      needsRefund = true;
+      createdOrphanPaymentId = orphanPayment.id;
+      paymentRefundEmailReason = reason;
+
+      const refundUserId = checkoutPayment?.userId ?? notes.userId;
+      if (refundUserId) {
+        const refundUser = await tx.user.findUnique({
+          where: { id: refundUserId },
+          select: { email: true, firstName: true },
+        });
+        if (refundUser) {
+          orphanUserContact = refundUser;
+        }
+      }
+      return;
+    }
 
     const conflict = await tx.booking.findFirst({
       where: {
@@ -118,18 +191,15 @@ async function handlePaymentCaptured(
     });
 
     if (conflict) {
-      const orphanPayment = await tx.payment.create({
+      const orphanPayment = await tx.payment.update({
+        where: { id: checkoutPayment.id },
         data: {
-          bookingId: null,
-          holdId: notes.holdId,
-          userId: notes.userId,
-          razorpayOrderId,
-          razorpayPaymentId,
-          amount: amountRupees,
           status: "PAID",
+          razorpayPaymentId,
           refundStatus: "PROCESSING",
           orphanReason: `Room ${notes.roomId} was booked by another user before this payment's webhook arrived.`,
         },
+        select: { id: true },
       });
       needsRefund = true;
       createdOrphanPaymentId = orphanPayment.id;
@@ -153,7 +223,7 @@ async function handlePaymentCaptured(
 
     const room = await tx.room.findUnique({
       where: { id: notes.roomId },
-      select: { price: true, name: true, hotel: { select: { name: true } } },
+      select: { name: true, hotel: { select: { name: true } } },
     });
     if (!room)
       throw new ApiError(404, "Room not found during booking confirmation");
@@ -165,31 +235,23 @@ async function handlePaymentCaptured(
     if (!user)
       throw new ApiError(404, "User not found during booking confirmation");
 
-    const dayCount = Math.ceil(
-      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24),
-    );
-    const totalPrice = dayCount * Number(room.price);
-
     const booking = await tx.booking.create({
       data: {
         roomId: notes.roomId,
         userId: notes.userId,
         checkIn,
         checkOut,
-        totalPrice,
+        totalPrice: checkoutPayment.amount,
         guests: Number(notes.guests),
         status: "CONFIRMED",
       },
     });
 
-    await tx.payment.create({
+    await tx.payment.update({
+      where: { id: checkoutPayment.id },
       data: {
         bookingId: booking.id,
-        holdId: notes.holdId,
-        userId: notes.userId,
-        razorpayOrderId,
         razorpayPaymentId,
-        amount: amountRupees,
         status: "PAID",
       },
     });
@@ -235,6 +297,22 @@ async function handlePaymentCaptured(
       }),
     ).catch((err) => {
       console.error(`Failed to send room-unavailable email to ${email}:`, err);
+    });
+  }
+
+  if (paymentRefundEmailReason && orphanUserContact && createdOrphanPaymentId) {
+    const { email, firstName } = orphanUserContact;
+    sendEmail(
+      email,
+      "Payment Refund Initiated — StayEasy",
+      paymentRefundInitiatedTemplate({
+        firstName,
+        totalPrice: amountRupees,
+        referenceId: createdOrphanPaymentId,
+        reason: paymentRefundEmailReason,
+      }),
+    ).catch((err) => {
+      console.error(`Failed to send payment-refund email to ${email}:`, err);
     });
   }
 

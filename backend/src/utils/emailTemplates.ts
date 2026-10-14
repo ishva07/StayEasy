@@ -99,6 +99,26 @@ export const roomUnavailableTemplate = (data: RoomUnavailableEmailData): string 
   return wrapper("Room No Longer Available — Refund In Progress", body);
 };
 
+interface PaymentRefundInitiatedEmailData {
+  firstName: string;
+  totalPrice: number | string;
+  referenceId: string;
+  reason: string;
+}
+
+export const paymentRefundInitiatedTemplate = (
+  data: PaymentRefundInitiatedEmailData,
+): string => {
+  const body = `
+    <p>Hi ${data.firstName},</p>
+    <p>Your payment of <strong>₹${data.totalPrice}</strong> was successful, but we could not complete the booking because ${data.reason}.</p>
+    <p>We're processing a full refund to your original payment method. It should reflect within a few business days.</p>
+    <p style="color: #666; font-size: 13px;">Reference ID: ${data.referenceId}</p>
+    <p>We're sorry for the inconvenience.</p>
+  `;
+  return wrapper("Payment Refund Initiated — StayEasy", body);
+};
+
 interface RefundCompletedEmailData {
   firstName: string;
   totalPrice: number | string;
