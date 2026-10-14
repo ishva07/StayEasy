@@ -12,6 +12,8 @@ import propertyTypeRoute from "../modules/propertyType/propertyType.route";
 import reviewRoute from "../modules/reviews/reviews.route";
 import aiSearchRoute from "../modules/aiSearchLog/aiSearchLog.route";
 import aiSearchLogAdminRoute from "../modules/aiSearchLogAdmin/aiSearchLogAdmin.route";
+import userAdminRoute from "../modules/userAdmin/userAdmin.route";
+import roleAdminRoute from "../modules/roleAdmin/roleAdmin.route";
 
 const route = Router();
 
@@ -28,5 +30,7 @@ route.use("/property-type",propertyTypeRoute);
 route.use("/reviews",reviewRoute);
 route.use("/search/ai", aiSearchRoute);
 route.use("/ai-search-logs",aiSearchLogAdminRoute)
+route.use("/users",userAdminRoute)
+route.use("/roles",roleAdminRoute)
 
 export default route;

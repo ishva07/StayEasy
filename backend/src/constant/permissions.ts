@@ -31,5 +31,9 @@ export const PERMISSIONS={
     VIEW_MY_REVIEW:"view_my_review",
     EDIT_REVIEW_STATUS:"edit_review_status",
     VIEW_ALL_REVIEW:"view_all_review",
-    VIEW_AI_SEARCH_LOG:"view_ai_search_log"
+    VIEW_AI_SEARCH_LOG:"view_ai_search_log",
+    VIEW_USERS:"view_users",
+    EDIT_USER_ROLE:"edit_user_role",
+    VIEW_ROLES:"view_roles",
+    EDIT_ROLE_PERMISSIONS:"edit_role_permissions"
 }as const;
