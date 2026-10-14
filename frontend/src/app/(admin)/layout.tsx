@@ -11,8 +11,10 @@ import {
   Hotel,
   LayoutDashboard,
   MapPin,
+  ShieldCheck,
   Star,
   Tag,
+  Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -92,6 +94,16 @@ export default function AdminLayout({
             label: "AI Search Logs",
             href: "/admin/aiSearchLog",
             icon: Building2,
+          },
+          {
+            label: "Users",
+            href: "/admin/users",
+            icon: Users,
+          },
+          {
+            label: "Roles",
+            href: "/admin/roles",
+            icon: ShieldCheck,
           },
         ]}
       >
