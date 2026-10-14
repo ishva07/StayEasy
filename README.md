@@ -2,7 +2,7 @@
 
 **Live site:** [stayeasy.duckdns.org](https://stayeasy.duckdns.org)
 
-**Product demo:** [Watch the 58-second walkthrough](./StayEasy-Portfolio-Demo.mp4)
+**Product demo:** [Watch the demo video](https://youtu.be/ZCuwEBqWLbQ)
 
 A full-stack hotel discovery and booking platform with natural-language search, online payments, and role-based administration.
 
@@ -157,7 +157,7 @@ All routes are prefixed with `/api/v1`. Some routes require authentication and/o
 
 **Booking consistency.** Avoiding double bookings. When a guest starts checkout, the system temporarily holds the room for 10 minutes. When payment is confirmed, it checks availability again before confirming the booking. This helps prevent two guests from booking the same room for overlapping dates at the same time.
 
-**Payment reliability.** Razorpay webhooks are verified with HMAC-SHA256 against the raw request body. A unique database constraint on webhook event IDs prevents duplicate events from being processed twice. Checkout stores its quoted amount with the Razorpay order; the capture webhook verifies that amount and confirms the booking using the saved quote, not the room's current price. Captured payments with a missing checkout record, mismatched amount, or unavailable room are recorded and sent through the refund flow.
+**Payment reliability.** Razorpay webhooks are verified with HMAC-SHA256 against the raw request body. A unique database constraint on webhook event IDs prevents duplicate events from being processed twice. Checkout stores its amount with the Razorpay order; the capture webhook verifies that amount and confirms the booking using the saved amount, not the room's current price. Captured payments with a missing checkout record, mismatched amount, or unavailable room are recorded and sent through the refund flow.
 
 **AI search fallback.** Gemini parses queries into filters but does not access the database. A deterministic fallback extracts entities and filters for PostgreSQL full-text search when AI parsing is unavailable.
 
