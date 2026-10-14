@@ -155,7 +155,7 @@ All routes are prefixed with `/api/v1`. Some routes require authentication and/o
 
 ## Technical Deep Dives
 
-**Booking consistency.** Redis `SET NX EX` holds each room-night for 600 seconds during checkout. During payment capture, a database transaction locks the room row before checking for overlapping bookings and confirming one. This serializes concurrent payment-capture webhooks for the same room; other booking writers must follow the same locking rule for it to cover them too.
+**Booking consistency.** Avoiding double bookings. When a guest starts checkout, the system temporarily holds the room for 10 minutes. When payment is confirmed, it checks availability again before confirming the booking. This helps prevent two guests from booking the same room for overlapping dates at the same time.
 
 **Payment reliability.** Razorpay webhooks are verified with HMAC-SHA256 against the raw request body. A unique database constraint on webhook event IDs prevents duplicate events from being processed twice. Checkout stores its quoted amount with the Razorpay order; the capture webhook verifies that amount and confirms the booking using the saved quote, not the room's current price. Captured payments with a missing checkout record, mismatched amount, or unavailable room are recorded and sent through the refund flow.
 
@@ -170,8 +170,6 @@ All routes are prefixed with `/api/v1`. Some routes require authentication and/o
 ## Deployment
 
 The application is deployed on an Azure VM using Docker Compose, with PostgreSQL, Redis, and Nginx providing HTTPS access. Visit the [live site](https://stayeasy.duckdns.org).
-
-A limited load test exercised selected pages and API routes with up to 100 virtual users and reported no errors during those runs. This is an indicative test, not a capacity guarantee; detailed methodology and results can be documented separately.
 
 ## Testing
 
@@ -192,6 +190,4 @@ npx tsc --noEmit
 ## Roadmap
 
 - [ ] Add an automated test suite and CI/CD pipeline
-- [ ] Schedule daily database backups and store copies off the VM
 - [ ] Move PostgreSQL to a managed service
-- [ ] Expand load tests to filtered hotel lists and booking flows
